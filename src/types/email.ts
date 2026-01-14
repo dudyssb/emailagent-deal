@@ -24,11 +24,24 @@ export interface ValidationError {
 }
 
 export interface CampaignMetrics {
+  id: string;
+  lista: string;
+  assunto: string;
+  nomeInterno: string;
+  data: string;
   segmento: Segment;
-  taxa_entrega: number;
-  taxa_abertura: number;
-  taxa_cliques: number;
-  bounces: number;
+  mensagensEnviadas: number;
+  aberturas: number;
+  aberturasUnicas: number;
+  hardBounces: number;
+  softBounces: number;
+  cliques: number;
+  cliquesUnicos: number;
+  // Calculated rates
+  taxaEntrega: number;
+  taxaAbertura: number;
+  taxaCliques: number;
+  totalBounces: number;
 }
 
 export interface ProcessingResult {
