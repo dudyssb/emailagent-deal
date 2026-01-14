@@ -74,11 +74,85 @@ const DOMAIN_SEGMENT_MAP: Record<string, Segment> = {
   'startup': 'Tech/Indústria/Inovação',
 };
 
+// Mapping keywords in "nome interno" to segments
+const NOME_INTERNO_SEGMENT_MAP: Record<string, Segment> = {
+  // Financial
+  'financeiro': 'Mercado Financeiro',
+  'financeiras': 'Mercado Financeiro',
+  'banco': 'Mercado Financeiro',
+  'bancos': 'Mercado Financeiro',
+  'finance': 'Mercado Financeiro',
+  'fintech': 'Mercado Financeiro',
+  'investimento': 'Mercado Financeiro',
+  'investimentos': 'Mercado Financeiro',
+  'seguro': 'Mercado Financeiro',
+  'seguros': 'Mercado Financeiro',
+  'corretora': 'Mercado Financeiro',
+  'corretoras': 'Mercado Financeiro',
+  
+  // Agro
+  'agro': 'Agro/relacionados',
+  'agronegocio': 'Agro/relacionados',
+  'agronegócio': 'Agro/relacionados',
+  'agricola': 'Agro/relacionados',
+  'agrícola': 'Agro/relacionados',
+  'rural': 'Agro/relacionados',
+  'fazenda': 'Agro/relacionados',
+  'fazendas': 'Agro/relacionados',
+  'pecuaria': 'Agro/relacionados',
+  'pecuária': 'Agro/relacionados',
+  'cooperativa': 'Agro/relacionados',
+  'cooperativas': 'Agro/relacionados',
+  
+  // Varejo
+  'varejo': 'Varejo',
+  'retail': 'Varejo',
+  'loja': 'Varejo',
+  'lojas': 'Varejo',
+  'comercio': 'Varejo',
+  'comércio': 'Varejo',
+  'ecommerce': 'Varejo',
+  'e-commerce': 'Varejo',
+  'atacado': 'Varejo',
+  'supermercado': 'Varejo',
+  'supermercados': 'Varejo',
+  'magazine': 'Varejo',
+  
+  // Tech
+  'tech': 'Tech/Indústria/Inovação',
+  'tecnologia': 'Tech/Indústria/Inovação',
+  'software': 'Tech/Indústria/Inovação',
+  'saas': 'Tech/Indústria/Inovação',
+  'industria': 'Tech/Indústria/Inovação',
+  'indústria': 'Tech/Indústria/Inovação',
+  'industrial': 'Tech/Indústria/Inovação',
+  'inovacao': 'Tech/Indústria/Inovação',
+  'inovação': 'Tech/Indústria/Inovação',
+  'startup': 'Tech/Indústria/Inovação',
+  'startups': 'Tech/Indústria/Inovação',
+  'ti': 'Tech/Indústria/Inovação',
+  'digital': 'Tech/Indústria/Inovação',
+  'manufacturing': 'Tech/Indústria/Inovação',
+  'manufatura': 'Tech/Indústria/Inovação',
+};
+
 export function categorizeByDomain(email: string): Segment {
   const domain = email.split('@')[1]?.toLowerCase() || '';
   
   for (const [keyword, segment] of Object.entries(DOMAIN_SEGMENT_MAP)) {
     if (domain.includes(keyword)) {
+      return segment;
+    }
+  }
+  
+  return 'Outros';
+}
+
+export function categorizeByNomeInterno(nomeInterno: string): Segment {
+  const normalized = nomeInterno.toLowerCase();
+  
+  for (const [keyword, segment] of Object.entries(NOME_INTERNO_SEGMENT_MAP)) {
+    if (normalized.includes(keyword)) {
       return segment;
     }
   }
@@ -205,6 +279,30 @@ export function exportToCSV(contacts: EmailContact[]): string {
   ].join('\n');
 }
 
+// E-goi CSV columns mapping
+const EGOI_COLUMNS = {
+  id: ['id'],
+  lista: ['lista'],
+  assunto: ['assunto'],
+  nomeInterno: ['nome interno', 'nome_interno', 'nomeinterno'],
+  data: ['data'],
+  mensagensEnviadas: ['mensagens enviadas', 'mensagens_enviadas', 'enviadas'],
+  aberturas: ['aberturas'],
+  aberturasUnicas: ['aberturas únicas', 'aberturas unicas', 'aberturas_unicas'],
+  hardBounces: ['hard bounces', 'hard_bounces', 'hardbounces'],
+  softBounces: ['soft bounces', 'soft_bounces', 'softbounces'],
+  cliques: ['cliques'],
+  cliquesUnicos: ['cliques únicos', 'cliques unicos', 'cliques_unicos'],
+};
+
+function findColumnIndex(header: string[], aliases: string[]): number {
+  for (const alias of aliases) {
+    const index = header.findIndex(h => h === alias);
+    if (index !== -1) return index;
+  }
+  return -1;
+}
+
 export function parseMetricsCSV(csvContent: string): MetricsProcessingResult {
   const lines = csvContent.split('\n').filter(line => line.trim());
   const metrics: CampaignMetrics[] = [];
@@ -219,26 +317,43 @@ export function parseMetricsCSV(csvContent: string): MetricsProcessingResult {
     return { metrics, errors };
   }
 
-  // Parse header
+  // Parse header - normalize to lowercase
   const header = lines[0].split(/[,;]/).map(h => h.trim().toLowerCase().replace(/"/g, ''));
-  const segmentoIndex = header.findIndex(h => h === 'segmento');
-  const taxaEntregaIndex = header.findIndex(h => h === 'taxa_entrega');
-  const taxaAberturaIndex = header.findIndex(h => h === 'taxa_abertura');
-  const taxaCliquesIndex = header.findIndex(h => h === 'taxa_cliques');
-  const bouncesIndex = header.findIndex(h => h === 'bounces');
+  
+  // Find column indices
+  const idIndex = findColumnIndex(header, EGOI_COLUMNS.id);
+  const listaIndex = findColumnIndex(header, EGOI_COLUMNS.lista);
+  const assuntoIndex = findColumnIndex(header, EGOI_COLUMNS.assunto);
+  const nomeInternoIndex = findColumnIndex(header, EGOI_COLUMNS.nomeInterno);
+  const dataIndex = findColumnIndex(header, EGOI_COLUMNS.data);
+  const mensagensEnviadasIndex = findColumnIndex(header, EGOI_COLUMNS.mensagensEnviadas);
+  const aberturasIndex = findColumnIndex(header, EGOI_COLUMNS.aberturas);
+  const aberturasUnicasIndex = findColumnIndex(header, EGOI_COLUMNS.aberturasUnicas);
+  const hardBouncesIndex = findColumnIndex(header, EGOI_COLUMNS.hardBounces);
+  const softBouncesIndex = findColumnIndex(header, EGOI_COLUMNS.softBounces);
+  const cliquesIndex = findColumnIndex(header, EGOI_COLUMNS.cliques);
+  const cliquesUnicosIndex = findColumnIndex(header, EGOI_COLUMNS.cliquesUnicos);
 
+  // Check required columns
   const missingColumns: string[] = [];
-  if (segmentoIndex === -1) missingColumns.push('segmento');
-  if (taxaEntregaIndex === -1) missingColumns.push('taxa_entrega');
-  if (taxaAberturaIndex === -1) missingColumns.push('taxa_abertura');
-  if (taxaCliquesIndex === -1) missingColumns.push('taxa_cliques');
-  if (bouncesIndex === -1) missingColumns.push('bounces');
+  if (idIndex === -1) missingColumns.push('id');
+  if (listaIndex === -1) missingColumns.push('lista');
+  if (assuntoIndex === -1) missingColumns.push('assunto');
+  if (nomeInternoIndex === -1) missingColumns.push('nome interno');
+  if (dataIndex === -1) missingColumns.push('data');
+  if (mensagensEnviadasIndex === -1) missingColumns.push('mensagens enviadas');
+  if (aberturasIndex === -1) missingColumns.push('aberturas');
+  if (aberturasUnicasIndex === -1) missingColumns.push('aberturas únicas');
+  if (hardBouncesIndex === -1) missingColumns.push('hard bounces');
+  if (softBouncesIndex === -1) missingColumns.push('soft bounces');
+  if (cliquesIndex === -1) missingColumns.push('cliques');
+  if (cliquesUnicosIndex === -1) missingColumns.push('cliques únicos');
 
   if (missingColumns.length > 0) {
     errors.push({
       linha_afetada: 1,
       campo: 'cabeçalho',
-      mensagem_erro: `Colunas obrigatórias não encontradas: ${missingColumns.join(', ')}. Encontrado: ${header.join(', ')}`,
+      mensagem_erro: `Colunas não encontradas: ${missingColumns.join(', ')}. Colunas do arquivo: ${header.join(', ')}`,
     });
     return { metrics, errors };
   }
@@ -248,87 +363,56 @@ export function parseMetricsCSV(csvContent: string): MetricsProcessingResult {
     const line = lines[i];
     const values = line.split(/[,;]/).map(v => v.trim().replace(/"/g, ''));
     
-    const segmentoRaw = values[segmentoIndex]?.trim();
-    const taxaEntregaRaw = values[taxaEntregaIndex]?.trim();
-    const taxaAberturaRaw = values[taxaAberturaIndex]?.trim();
-    const taxaCliquesRaw = values[taxaCliquesIndex]?.trim();
-    const bouncesRaw = values[bouncesIndex]?.trim();
+    const id = values[idIndex]?.trim() || '';
+    const lista = values[listaIndex]?.trim() || '';
+    const assunto = values[assuntoIndex]?.trim() || '';
+    const nomeInterno = values[nomeInternoIndex]?.trim() || '';
+    const data = values[dataIndex]?.trim() || '';
+    const mensagensEnviadasRaw = values[mensagensEnviadasIndex]?.trim() || '0';
+    const aberturasRaw = values[aberturasIndex]?.trim() || '0';
+    const aberturasUnicasRaw = values[aberturasUnicasIndex]?.trim() || '0';
+    const hardBouncesRaw = values[hardBouncesIndex]?.trim() || '0';
+    const softBouncesRaw = values[softBouncesIndex]?.trim() || '0';
+    const cliquesRaw = values[cliquesIndex]?.trim() || '0';
+    const cliquesUnicosRaw = values[cliquesUnicosIndex]?.trim() || '0';
 
-    // Validate segmento
-    if (!segmentoRaw) {
-      errors.push({
-        linha_afetada: i + 1,
-        campo: 'segmento',
-        mensagem_erro: 'Segmento não informado.',
-      });
-      continue;
-    }
+    // Parse numeric values
+    const mensagensEnviadas = parseInt(mensagensEnviadasRaw.replace(/[^\d]/g, ''), 10) || 0;
+    const aberturas = parseInt(aberturasRaw.replace(/[^\d]/g, ''), 10) || 0;
+    const aberturasUnicas = parseInt(aberturasUnicasRaw.replace(/[^\d]/g, ''), 10) || 0;
+    const hardBounces = parseInt(hardBouncesRaw.replace(/[^\d]/g, ''), 10) || 0;
+    const softBounces = parseInt(softBouncesRaw.replace(/[^\d]/g, ''), 10) || 0;
+    const cliques = parseInt(cliquesRaw.replace(/[^\d]/g, ''), 10) || 0;
+    const cliquesUnicos = parseInt(cliquesUnicosRaw.replace(/[^\d]/g, ''), 10) || 0;
 
-    const segmento = VALID_SEGMENTS.find(s => 
-      s.toLowerCase() === segmentoRaw.toLowerCase() ||
-      s.toLowerCase().includes(segmentoRaw.toLowerCase()) ||
-      segmentoRaw.toLowerCase().includes(s.toLowerCase().split('/')[0])
-    );
+    // Calculate rates
+    const totalBounces = hardBounces + softBounces;
+    const entregues = mensagensEnviadas - totalBounces;
+    const taxaEntrega = mensagensEnviadas > 0 ? (entregues / mensagensEnviadas) * 100 : 0;
+    const taxaAbertura = entregues > 0 ? (aberturasUnicas / entregues) * 100 : 0;
+    const taxaCliques = entregues > 0 ? (cliquesUnicos / entregues) * 100 : 0;
 
-    if (!segmento) {
-      errors.push({
-        linha_afetada: i + 1,
-        campo: 'segmento',
-        mensagem_erro: `Segmento inválido: "${segmentoRaw}". Valores aceitos: ${VALID_SEGMENTS.join(', ')}`,
-      });
-      continue;
-    }
-
-    // Validate taxa_entrega
-    const taxaEntrega = parseFloat(taxaEntregaRaw);
-    if (isNaN(taxaEntrega) || taxaEntrega < 0 || taxaEntrega > 100) {
-      errors.push({
-        linha_afetada: i + 1,
-        campo: 'taxa_entrega',
-        mensagem_erro: `Taxa de entrega inválida: "${taxaEntregaRaw}". Esperado: número entre 0 e 100.`,
-      });
-      continue;
-    }
-
-    // Validate taxa_abertura
-    const taxaAbertura = parseFloat(taxaAberturaRaw);
-    if (isNaN(taxaAbertura) || taxaAbertura < 0 || taxaAbertura > 100) {
-      errors.push({
-        linha_afetada: i + 1,
-        campo: 'taxa_abertura',
-        mensagem_erro: `Taxa de abertura inválida: "${taxaAberturaRaw}". Esperado: número entre 0 e 100.`,
-      });
-      continue;
-    }
-
-    // Validate taxa_cliques
-    const taxaCliques = parseFloat(taxaCliquesRaw);
-    if (isNaN(taxaCliques) || taxaCliques < 0 || taxaCliques > 100) {
-      errors.push({
-        linha_afetada: i + 1,
-        campo: 'taxa_cliques',
-        mensagem_erro: `Taxa de cliques inválida: "${taxaCliquesRaw}". Esperado: número entre 0 e 100.`,
-      });
-      continue;
-    }
-
-    // Validate bounces
-    const bounces = parseInt(bouncesRaw, 10);
-    if (isNaN(bounces) || bounces < 0) {
-      errors.push({
-        linha_afetada: i + 1,
-        campo: 'bounces',
-        mensagem_erro: `Bounces inválido: "${bouncesRaw}". Esperado: número inteiro >= 0.`,
-      });
-      continue;
-    }
+    // Categorize segment from nome interno
+    const segmento = categorizeByNomeInterno(nomeInterno);
 
     metrics.push({
+      id,
+      lista,
+      assunto,
+      nomeInterno,
+      data,
       segmento,
-      taxa_entrega: taxaEntrega,
-      taxa_abertura: taxaAbertura,
-      taxa_cliques: taxaCliques,
-      bounces,
+      mensagensEnviadas,
+      aberturas,
+      aberturasUnicas,
+      hardBounces,
+      softBounces,
+      cliques,
+      cliquesUnicos,
+      taxaEntrega,
+      taxaAbertura,
+      taxaCliques,
+      totalBounces,
     });
   }
 
