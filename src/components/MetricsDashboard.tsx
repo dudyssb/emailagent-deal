@@ -1,9 +1,14 @@
-import { CampaignMetrics, Segment } from '@/types/email';
+import { CampaignMetrics, Segment, ValidationError } from '@/types/email';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { TrendingUp, Mail, MousePointer, AlertTriangle, Send } from 'lucide-react';
+import { TrendingUp, Mail, MousePointer, AlertTriangle, Send, Upload, FileSpreadsheet } from 'lucide-react';
+import { FileUploader } from './FileUploader';
+import { ErrorList } from './ErrorList';
 
 interface MetricsDashboardProps {
   metrics: CampaignMetrics[];
+  errors?: ValidationError[];
+  onFileLoad?: (content: string) => void;
+  isLoading?: boolean;
 }
 
 const SEGMENT_COLORS: Record<Segment, string> = {
@@ -14,15 +19,40 @@ const SEGMENT_COLORS: Record<Segment, string> = {
   'Outros': 'hsl(220, 10%, 50%)',
 };
 
-export function MetricsDashboard({ metrics }: MetricsDashboardProps) {
+export function MetricsDashboard({ metrics, errors = [], onFileLoad, isLoading }: MetricsDashboardProps) {
   if (metrics.length === 0) {
     return (
-      <div className="rounded-xl border border-border bg-card p-12 text-center">
-        <TrendingUp className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-        <p className="text-muted-foreground">Nenhuma métrica de campanha disponível</p>
-        <p className="text-sm text-muted-foreground mt-2">
-          Importe um CSV com métricas para visualizar o dashboard
-        </p>
+      <div className="space-y-6">
+        {onFileLoad && (
+          <div className="space-y-4">
+            <div className="rounded-xl border border-border bg-card p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <FileSpreadsheet className="w-6 h-6 text-primary" />
+                <h3 className="text-lg font-semibold text-foreground">Importar Métricas de Campanha</h3>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">
+                Faça upload de um CSV com as colunas: <code className="bg-muted px-1.5 py-0.5 rounded text-xs">segmento</code>,{' '}
+                <code className="bg-muted px-1.5 py-0.5 rounded text-xs">taxa_entrega</code>,{' '}
+                <code className="bg-muted px-1.5 py-0.5 rounded text-xs">taxa_abertura</code>,{' '}
+                <code className="bg-muted px-1.5 py-0.5 rounded text-xs">taxa_cliques</code>,{' '}
+                <code className="bg-muted px-1.5 py-0.5 rounded text-xs">bounces</code>
+              </p>
+              <FileUploader onFileLoad={onFileLoad} isLoading={isLoading} />
+            </div>
+            
+            {errors.length > 0 && <ErrorList errors={errors} />}
+          </div>
+        )}
+        
+        {!onFileLoad && (
+          <div className="rounded-xl border border-border bg-card p-12 text-center">
+            <TrendingUp className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+            <p className="text-muted-foreground">Nenhuma métrica de campanha disponível</p>
+            <p className="text-sm text-muted-foreground mt-2">
+              Importe um CSV com métricas para visualizar o dashboard
+            </p>
+          </div>
+        )}
       </div>
     );
   }
