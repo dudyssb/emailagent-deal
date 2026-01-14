@@ -8,7 +8,7 @@ import { ContactsTable } from '@/components/ContactsTable';
 import { EmailPreview } from '@/components/EmailPreview';
 import { MetricsDashboard } from '@/components/MetricsDashboard';
 import { ExportPanel } from '@/components/ExportPanel';
-import { parseCSV } from '@/utils/csvParser';
+import { parseCSV, parseMetricsCSV } from '@/utils/csvParser';
 import { generateAllEmailsForSegment } from '@/utils/emailGenerator';
 import { EmailContact, ValidationError, Segment, CampaignMetrics, NurturingEmail } from '@/types/email';
 import { Button } from '@/components/ui/button';
@@ -31,13 +31,9 @@ export default function Index() {
   const [selectedSegment, setSelectedSegment] = useState<Segment | null>(null);
   const [generatedEmails, setGeneratedEmails] = useState<NurturingEmail[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
-  const [metrics] = useState<CampaignMetrics[]>([
-    { segmento: 'Mercado Financeiro', taxa_entrega: 95.2, taxa_abertura: 32.5, taxa_cliques: 8.2, bounces: 12 },
-    { segmento: 'Agro/relacionados', taxa_entrega: 92.8, taxa_abertura: 28.1, taxa_cliques: 6.4, bounces: 18 },
-    { segmento: 'Varejo', taxa_entrega: 94.5, taxa_abertura: 35.8, taxa_cliques: 9.1, bounces: 8 },
-    { segmento: 'Tech/Indústria/Inovação', taxa_entrega: 96.1, taxa_abertura: 38.2, taxa_cliques: 12.5, bounces: 5 },
-    { segmento: 'Outros', taxa_entrega: 91.3, taxa_abertura: 22.4, taxa_cliques: 4.8, bounces: 22 },
-  ]);
+  const [metrics, setMetrics] = useState<CampaignMetrics[]>([]);
+  const [metricsErrors, setMetricsErrors] = useState<ValidationError[]>([]);
+  const [isProcessingMetrics, setIsProcessingMetrics] = useState(false);
 
   const handleFileLoad = useCallback((content: string) => {
     setIsProcessing(true);
@@ -71,6 +67,17 @@ export default function Index() {
     setGeneratedEmails(emails);
     setActiveTab('emails');
   }, [contacts, selectedSegment]);
+
+  const handleMetricsFileLoad = useCallback((content: string) => {
+    setIsProcessingMetrics(true);
+    
+    setTimeout(() => {
+      const result = parseMetricsCSV(content);
+      setMetrics(result.metrics);
+      setMetricsErrors(result.errors);
+      setIsProcessingMetrics(false);
+    }, 500);
+  }, []);
 
   const hasData = contacts.length > 0;
 
@@ -186,10 +193,15 @@ export default function Index() {
             <div>
               <h2 className="text-2xl font-bold text-foreground mb-2">Métricas de Campanha</h2>
               <p className="text-muted-foreground">
-                Acompanhe o desempenho das campanhas de e-mail por segmento.
+                Importe um CSV com métricas ou visualize o dashboard de desempenho.
               </p>
             </div>
-            <MetricsDashboard metrics={metrics} />
+            <MetricsDashboard 
+              metrics={metrics} 
+              errors={metricsErrors}
+              onFileLoad={handleMetricsFileLoad}
+              isLoading={isProcessingMetrics}
+            />
           </div>
         );
 
