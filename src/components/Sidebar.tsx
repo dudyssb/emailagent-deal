@@ -1,8 +1,9 @@
-import { Upload, Users, Mail, BarChart3, FileDown, Settings } from 'lucide-react';
+import { Upload, Users, Mail, BarChart3, FileDown, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 export type TabType = 'import' | 'contacts' | 'emails' | 'metrics' | 'export';
-
 interface SidebarProps {
   activeTab: TabType;
   onTabChange: (tab: TabType) => void;
@@ -18,6 +19,14 @@ const TABS = [
 ];
 
 export function Sidebar({ activeTab, onTabChange, hasData }: SidebarProps) {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+  };
+
   return (
     <aside className="w-64 bg-card border-r border-border min-h-screen p-4 flex flex-col">
       {/* Logo */}
@@ -55,9 +64,12 @@ export function Sidebar({ activeTab, onTabChange, hasData }: SidebarProps) {
 
       {/* Footer */}
       <div className="pt-4 border-t border-border">
-        <button className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">
-          <Settings className="w-5 h-5" />
-          Configurações
+        <button 
+          onClick={handleLogout}
+          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
+        >
+          <LogOut className="w-5 h-5" />
+          Sair
         </button>
       </div>
     </aside>
