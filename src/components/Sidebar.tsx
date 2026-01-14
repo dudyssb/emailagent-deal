@@ -1,12 +1,11 @@
 import { Upload, Users, Mail, BarChart3, FileDown, LogOut } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useAuth } from '@/contexts/AuthContext';
-import { useNavigate } from 'react-router-dom';
 
 export type TabType = 'import' | 'contacts' | 'emails' | 'metrics' | 'export';
 interface SidebarProps {
   activeTab: TabType;
   onTabChange: (tab: TabType) => void;
+  onLogout: () => void;
   hasData: boolean;
 }
 
@@ -18,14 +17,7 @@ const TABS = [
   { id: 'export' as TabType, label: 'Exportar', icon: FileDown, requiresData: true },
 ];
 
-export function Sidebar({ activeTab, onTabChange, hasData }: SidebarProps) {
-  const { logout } = useAuth();
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    logout();
-    navigate('/login');
-  };
+export function Sidebar({ activeTab, onTabChange, hasData, onLogout }: SidebarProps) {
 
   return (
     <aside className="w-64 bg-card border-r border-border min-h-screen p-4 flex flex-col">
@@ -65,7 +57,7 @@ export function Sidebar({ activeTab, onTabChange, hasData }: SidebarProps) {
       {/* Footer */}
       <div className="pt-4 border-t border-border">
         <button 
-          onClick={handleLogout}
+          onClick={onLogout}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
         >
           <LogOut className="w-5 h-5" />

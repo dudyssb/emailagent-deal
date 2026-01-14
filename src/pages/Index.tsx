@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Sidebar, TabType } from '@/components/Sidebar';
 import { FileUploader } from '@/components/FileUploader';
 import { SegmentStats } from '@/components/SegmentStats';
@@ -11,9 +12,12 @@ import { parseCSV } from '@/utils/csvParser';
 import { generateAllEmailsForSegment } from '@/utils/emailGenerator';
 import { EmailContact, ValidationError, Segment, CampaignMetrics, NurturingEmail } from '@/types/email';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
 import { Sparkles, Upload } from 'lucide-react';
 
 export default function Index() {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<TabType>('import');
   const [contacts, setContacts] = useState<EmailContact[]>([]);
   const [errors, setErrors] = useState<ValidationError[]>([]);
@@ -54,6 +58,11 @@ export default function Index() {
   const handleSegmentSelect = useCallback((segment: Segment) => {
     setSelectedSegment(segment === selectedSegment ? null : segment);
   }, [selectedSegment]);
+
+  const handleLogout = useCallback(() => {
+    logout();
+    navigate('/login');
+  }, [logout, navigate]);
 
   const handleGenerateEmails = useCallback(() => {
     if (!selectedSegment) return;
@@ -205,7 +214,7 @@ export default function Index() {
 
   return (
     <div className="flex min-h-screen bg-background">
-      <Sidebar activeTab={activeTab} onTabChange={setActiveTab} hasData={hasData} />
+      <Sidebar activeTab={activeTab} onTabChange={setActiveTab} hasData={hasData} onLogout={handleLogout} />
       
       <main className="flex-1 p-8 overflow-auto">
         <div className="max-w-6xl mx-auto">
