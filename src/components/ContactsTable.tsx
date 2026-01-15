@@ -1,16 +1,29 @@
 import { EmailContact, Segment } from '@/types/email';
 import { SegmentBadge } from './SegmentBadge';
-import { Mail, ExternalLink, Search } from 'lucide-react';
-import { useState, useMemo } from 'react';
+import { Mail, ExternalLink, Search, Edit2, Check, X } from 'lucide-react';
+import { useState, useMemo, useCallback } from 'react';
 import { Input } from './ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
+import { Button } from './ui/button';
 
 interface ContactsTableProps {
   contacts: EmailContact[];
   selectedSegment?: Segment | null;
+  onUpdateSegment?: (email: string, newSegment: Segment) => void;
 }
 
-export function ContactsTable({ contacts, selectedSegment }: ContactsTableProps) {
+const SEGMENTS: Segment[] = [
+  'Mercado Financeiro',
+  'Agro/relacionados',
+  'Varejo',
+  'Tech/Indústria/Inovação',
+  'Outros',
+];
+
+export function ContactsTable({ contacts, selectedSegment, onUpdateSegment }: ContactsTableProps) {
   const [search, setSearch] = useState('');
+  const [editingEmail, setEditingEmail] = useState<string | null>(null);
+  const [pendingSegment, setPendingSegment] = useState<Segment | null>(null);
 
   const filteredContacts = useMemo(() => {
     let result = contacts;
@@ -30,6 +43,24 @@ export function ContactsTable({ contacts, selectedSegment }: ContactsTableProps)
     
     return result;
   }, [contacts, selectedSegment, search]);
+
+  const handleStartEdit = useCallback((email: string, currentSegment?: Segment) => {
+    setEditingEmail(email);
+    setPendingSegment(currentSegment || 'Outros');
+  }, []);
+
+  const handleConfirmEdit = useCallback(() => {
+    if (editingEmail && pendingSegment && onUpdateSegment) {
+      onUpdateSegment(editingEmail, pendingSegment);
+    }
+    setEditingEmail(null);
+    setPendingSegment(null);
+  }, [editingEmail, pendingSegment, onUpdateSegment]);
+
+  const handleCancelEdit = useCallback(() => {
+    setEditingEmail(null);
+    setPendingSegment(null);
+  }, []);
 
   return (
     <div className="space-y-4 animate-slide-up">
@@ -85,8 +116,56 @@ export function ContactsTable({ contacts, selectedSegment }: ContactsTableProps)
                       </a>
                     </td>
                     <td className="px-4 py-3">
-                      {contact.segmento && (
-                        <SegmentBadge segment={contact.segmento} size="sm" />
+                      {editingEmail === contact.email ? (
+                        <div className="flex items-center gap-2">
+                          <Select
+                            value={pendingSegment || undefined}
+                            onValueChange={(value) => setPendingSegment(value as Segment)}
+                          >
+                            <SelectTrigger className="w-[180px] h-8">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              {SEGMENTS.map(seg => (
+                                <SelectItem key={seg} value={seg}>
+                                  {seg}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-success hover:text-success"
+                            onClick={handleConfirmEdit}
+                          >
+                            <Check className="w-4 h-4" />
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8 text-destructive hover:text-destructive"
+                            onClick={handleCancelEdit}
+                          >
+                            <X className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          {contact.segmento && (
+                            <SegmentBadge segment={contact.segmento} size="sm" />
+                          )}
+                          {onUpdateSegment && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6 opacity-0 group-hover:opacity-100 hover:opacity-100"
+                              onClick={() => handleStartEdit(contact.email, contact.segmento)}
+                            >
+                              <Edit2 className="w-3 h-3 text-muted-foreground hover:text-foreground" />
+                            </Button>
+                          )}
+                        </div>
                       )}
                     </td>
                     <td className="px-4 py-3">

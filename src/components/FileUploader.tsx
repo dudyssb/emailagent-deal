@@ -1,20 +1,35 @@
 import { useCallback, useState } from 'react';
-import { Upload, FileText, AlertCircle, CheckCircle } from 'lucide-react';
+import { Upload, FileText, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Button } from './ui/button';
 
 interface FileUploaderProps {
   onFileLoad: (content: string) => void;
   isLoading?: boolean;
+  acceptedTypes?: string[];
+  showReupload?: boolean;
+  requiredColumns?: string;
 }
 
-export function FileUploader({ onFileLoad, isLoading }: FileUploaderProps) {
+export function FileUploader({ 
+  onFileLoad, 
+  isLoading, 
+  acceptedTypes = ['.csv'],
+  showReupload = false,
+  requiredColumns 
+}: FileUploaderProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [fileName, setFileName] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const acceptString = acceptedTypes.join(',');
+  const acceptLabel = acceptedTypes.map(t => t.replace('.', '').toUpperCase()).join(' ou ');
+
   const handleFile = useCallback((file: File) => {
-    if (!file.name.endsWith('.csv')) {
-      setError('Por favor, selecione um arquivo CSV.');
+    const fileExtension = '.' + file.name.split('.').pop()?.toLowerCase();
+    
+    if (!acceptedTypes.some(type => fileExtension === type.toLowerCase())) {
+      setError(`Por favor, selecione um arquivo ${acceptLabel}.`);
       return;
     }
 
@@ -30,7 +45,7 @@ export function FileUploader({ onFileLoad, isLoading }: FileUploaderProps) {
       setError('Erro ao ler o arquivo.');
     };
     reader.readAsText(file, 'UTF-8');
-  }, [onFileLoad]);
+  }, [onFileLoad, acceptedTypes, acceptLabel]);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -55,6 +70,32 @@ export function FileUploader({ onFileLoad, isLoading }: FileUploaderProps) {
     if (file) handleFile(file);
   }, [handleFile]);
 
+  const handleReset = useCallback(() => {
+    setFileName(null);
+    setError(null);
+  }, []);
+
+  // If file is loaded and showReupload is true, show a compact reupload button
+  if (fileName && !error && showReupload) {
+    return (
+      <div className="flex items-center gap-4 p-4 rounded-xl border border-success/30 bg-success/5">
+        <div className="flex items-center gap-3 flex-1">
+          <div className="w-10 h-10 rounded-lg bg-success/10 flex items-center justify-center">
+            <CheckCircle className="w-5 h-5 text-success" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-success">Arquivo carregado</p>
+            <p className="text-xs text-muted-foreground">{fileName}</p>
+          </div>
+        </div>
+        <Button variant="outline" size="sm" onClick={handleReset} className="gap-2">
+          <RefreshCw className="w-4 h-4" />
+          Enviar outro arquivo
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className="w-full">
       <div
@@ -71,7 +112,7 @@ export function FileUploader({ onFileLoad, isLoading }: FileUploaderProps) {
       >
         <input
           type="file"
-          accept=".csv"
+          accept={acceptString}
           onChange={handleInputChange}
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
           disabled={isLoading}
@@ -109,7 +150,7 @@ export function FileUploader({ onFileLoad, isLoading }: FileUploaderProps) {
             ) : (
               <>
                 <p className="text-lg font-medium text-foreground">
-                  Arraste seu arquivo CSV aqui
+                  Arraste seu arquivo {acceptLabel} aqui
                 </p>
                 <p className="text-sm text-muted-foreground mt-1">
                   ou clique para selecionar
@@ -118,10 +159,9 @@ export function FileUploader({ onFileLoad, isLoading }: FileUploaderProps) {
             )}
           </div>
 
-          {!fileName && !error && (
+          {!fileName && !error && requiredColumns && (
             <p className="text-xs text-muted-foreground">
-              Colunas obrigatórias: <code className="bg-muted px-1 rounded">nome</code> e{' '}
-              <code className="bg-muted px-1 rounded">email</code>
+              {requiredColumns}
             </p>
           )}
         </div>
