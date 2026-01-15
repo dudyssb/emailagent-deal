@@ -423,6 +423,119 @@ export function MetricsDashboard({ metrics, errors = [], onFileLoad, isLoading }
               </div>
             </div>
 
+            {/* Charts for Image Metrics */}
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Bar Chart - Absolute Values */}
+              <div className="rounded-xl border border-border bg-card p-6">
+                <h4 className="font-semibold text-foreground mb-4">Valores Absolutos</h4>
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={[
+                      { name: 'Enviados', valor: extractedMetrics.enviados },
+                      { name: 'Entregues', valor: extractedMetrics.entregues },
+                      { name: 'Aberturas', valor: extractedMetrics.aberturasUnicas },
+                      { name: 'Cliques', valor: extractedMetrics.cliquesUnicos },
+                    ]}>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                      <XAxis dataKey="name" className="text-xs" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                      <YAxis className="text-xs" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: 'hsl(var(--card))', 
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '8px'
+                        }}
+                        formatter={(value: number) => [value.toLocaleString(), 'Contactos']}
+                      />
+                      <Bar dataKey="valor" radius={[4, 4, 0, 0]}>
+                        <Cell fill="hsl(217, 91%, 45%)" />
+                        <Cell fill="hsl(142, 76%, 36%)" />
+                        <Cell fill="hsl(280, 65%, 55%)" />
+                        <Cell fill="hsl(199, 89%, 48%)" />
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+
+              {/* Horizontal Bar Chart - Performance Rates */}
+              <div className="rounded-xl border border-border bg-card p-6">
+                <h4 className="font-semibold text-foreground mb-4">Taxas de Performance</h4>
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart 
+                      data={[
+                        { name: 'Entrega', taxa: extractedMetrics.taxaEntrega },
+                        { name: 'Abertura', taxa: extractedMetrics.taxaAbertura },
+                        { name: 'Cliques', taxa: extractedMetrics.taxaCliques },
+                      ]} 
+                      layout="vertical"
+                    >
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                      <XAxis 
+                        type="number" 
+                        domain={[0, 100]} 
+                        tickFormatter={(v) => `${v}%`}
+                        tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                      />
+                      <YAxis 
+                        dataKey="name" 
+                        type="category" 
+                        width={70}
+                        tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                      />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: 'hsl(var(--card))', 
+                          border: '1px solid hsl(var(--border))',
+                          borderRadius: '8px'
+                        }}
+                        formatter={(v: number) => [`${v.toFixed(1)}%`, 'Taxa']}
+                      />
+                      <Bar dataKey="taxa" radius={[0, 4, 4, 0]}>
+                        <Cell fill="hsl(142, 76%, 36%)" />
+                        <Cell fill="hsl(217, 91%, 45%)" />
+                        <Cell fill="hsl(199, 89%, 48%)" />
+                      </Bar>
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              </div>
+            </div>
+
+            {/* Quality Metrics Chart */}
+            <div className="rounded-xl border border-border bg-card p-6">
+              <h4 className="font-semibold text-foreground mb-4">Métricas de Qualidade</h4>
+              <div className="h-48">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={[
+                    { name: 'Taxa Saída', valor: extractedMetrics.taxaSaida },
+                    { name: 'Taxa Bounce', valor: extractedMetrics.taxaBounce },
+                  ]}>
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                    <XAxis dataKey="name" tick={{ fill: 'hsl(var(--muted-foreground))' }} />
+                    <YAxis 
+                      domain={[0, Math.max(10, extractedMetrics.taxaSaida + 5, extractedMetrics.taxaBounce + 5)]} 
+                      tickFormatter={(v) => `${v}%`}
+                      tick={{ fill: 'hsl(var(--muted-foreground))' }}
+                    />
+                    <Tooltip 
+                      contentStyle={{ 
+                        backgroundColor: 'hsl(var(--card))', 
+                        border: '1px solid hsl(var(--border))',
+                        borderRadius: '8px'
+                      }}
+                      formatter={(v: number) => [`${v.toFixed(2)}%`, 'Taxa']}
+                    />
+                    <Bar dataKey="valor" radius={[4, 4, 0, 0]}>
+                      <Cell fill="hsl(45, 93%, 47%)" />
+                      <Cell fill="hsl(0, 84%, 60%)" />
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </div>
+
             {/* Formulas Reference */}
             <div className="rounded-xl border border-border bg-card/50 p-4">
               <h4 className="text-sm font-medium text-foreground mb-2">Fórmulas Utilizadas</h4>

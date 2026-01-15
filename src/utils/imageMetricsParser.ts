@@ -37,107 +37,98 @@ function extractContactsNumber(text: string, pattern: RegExp): number | null {
 }
 
 /**
- * Parse the OCR text to extract E-goi metrics
+ * Parse the OCR text to extract E-goi metrics using POSITION-BASED strategy
+ * E-goi format: metrics appear in order: Enviados, Entregues, Aberturas Únicas, Cliques Únicos
+ * Then in "qualidade" section: Remoções, Bounces
  */
 function parseEgoiText(text: string): ExtractedMetrics | null {
-  // Normalize text: lowercase, remove extra spaces
-  const normalized = text.toLowerCase().replace(/\s+/g, ' ');
-  
   console.log('OCR Raw Text:', text);
+
+  // 1. Normalize common OCR errors
+  let normalized = text
+    .replace(/ocontactos/gi, '0 contactos')  // OCR confuses "0" with "o"
+    .replace(/Ocontactos/gi, '0 contactos')
+    .replace(/O contactos/gi, '0 contactos')
+    .replace(/o contactos/gi, '0 contactos')
+    .replace(/\|/g, ' ')                      // Remove visual separators
+    .replace(/[—–]/g, '-')                    // Normalize dashes
+    .replace(/\s+/g, ' ');                    // Normalize spaces
+
   console.log('Normalized:', normalized);
 
-  // Patterns to match E-goi report format
-  // "ENVIADOS" section - just the main number
-  const enviadosPatterns = [
-    /enviados\s*[\n\r\s]*(\d+)/i,
-    /enviados[^\d]*(\d+)/i,
-    /(\d+)\s*enviados/i,
-  ];
-
-  // "X contactos" patterns for each metric
-  const entreguesPatterns = [
-    /entregues[^\d]*[\d,\.]+\s*%[^\d]*(\d+)\s*contactos/i,
-    /entregues[^\d]*(\d+)\s*contactos/i,
-    /taxa\s*de\s*entrega[^\d]*(\d+)\s*contactos/i,
-  ];
-
-  const aberturasPatterns = [
-    /aberturas\s*[úu]nicas[^\d]*[\d,\.]+\s*%[^\d]*(\d+)\s*contactos/i,
-    /aberturas\s*[úu]nicas[^\d]*(\d+)\s*contactos/i,
-    /(\d+)\s*contactos[^\n]*aberturas/i,
-  ];
-
-  const cliquesPatterns = [
-    /cliques\s*[úu]nicos[^\d]*[\d,\.]+\s*%[^\d]*(\d+)\s*contactos/i,
-    /cliques\s*[úu]nicos[^\d]*(\d+)\s*contactos/i,
-    /(\d+)\s*contactos[^\n]*cliques/i,
-  ];
-
-  const remocoesPatterns = [
-    /remo[çc][õo]es[^\d]*[\d,\.]+\s*%[^\d]*(\d+)\s*contactos/i,
-    /remo[çc][õo]es[^\d]*(\d+)\s*contactos/i,
-    /(\d+)\s*contactos[^\n]*remo[çc]/i,
-  ];
-
-  const bouncesPatterns = [
-    /bounces[^\d]*[\d,\.]+\s*%[^\d]*(\d+)\s*contactos/i,
-    /bounces[^\d]*(\d+)\s*contactos/i,
-    /(\d+)\s*contactos[^\n]*bounce/i,
-  ];
-
-  // Try to extract each metric
+  // 2. Extract "Enviados" - look for the main count (usually the first big number)
   let enviados: number | null = null;
-  let entregues: number | null = null;
-  let aberturasUnicas: number | null = null;
-  let cliquesUnicos: number | null = null;
-  let remocoes: number | null = null;
-  let bounces: number | null = null;
-
+  
+  // Try various patterns for "Enviados"
+  const enviadosPatterns = [
+    /(\d+)\s*enviados/i,
+    /enviados\s*(\d+)/i,
+    /^(\d+)\s/,  // First number at start
+  ];
+  
   for (const pattern of enviadosPatterns) {
-    enviados = extractContactsNumber(text, pattern);
-    if (enviados !== null) break;
+    const match = normalized.match(pattern);
+    if (match) {
+      enviados = parseInt(match[1].replace(/\./g, ''), 10);
+      if (!isNaN(enviados) && enviados > 0) break;
+    }
   }
 
-  for (const pattern of entreguesPatterns) {
-    entregues = extractContactsNumber(text, pattern);
-    if (entregues !== null) break;
+  // 3. Extract ALL "X contactos" in the ORDER they appear
+  const contactosRegex = /(\d+)\s*contactos/gi;
+  const contactosMatches = [...normalized.matchAll(contactosRegex)];
+  
+  console.log('Found contactos matches:', contactosMatches.map(m => m[1]));
+
+  // Map by POSITION (E-goi order: Entregues, Aberturas, Cliques)
+  const entregues = contactosMatches[0] ? parseInt(contactosMatches[0][1].replace(/\./g, ''), 10) : 0;
+  const aberturasUnicas = contactosMatches[1] ? parseInt(contactosMatches[1][1].replace(/\./g, ''), 10) : 0;
+  const cliquesUnicos = contactosMatches[2] ? parseInt(contactosMatches[2][1].replace(/\./g, ''), 10) : 0;
+
+  // 4. Extract "Métricas de qualidade" section (Remoções and Bounces)
+  let remocoes = 0;
+  let bounces = 0;
+
+  // Try to find the "qualidade" section
+  const qualidadeIndex = normalized.toLowerCase().indexOf('qualidade');
+  
+  if (qualidadeIndex > -1) {
+    // Get text after "qualidade"
+    const qualidadeSection = normalized.slice(qualidadeIndex);
+    const qualidadeContatos = [...qualidadeSection.matchAll(contactosRegex)];
+    
+    console.log('Qualidade section contactos:', qualidadeContatos.map(m => m[1]));
+    
+    remocoes = qualidadeContatos[0] ? parseInt(qualidadeContatos[0][1].replace(/\./g, ''), 10) : 0;
+    bounces = qualidadeContatos[1] ? parseInt(qualidadeContatos[1][1].replace(/\./g, ''), 10) : 0;
+  } else if (contactosMatches.length >= 5) {
+    // Fallback: if no "qualidade" section found, try 4th and 5th "contactos"
+    remocoes = parseInt(contactosMatches[3]?.[1]?.replace(/\./g, '') || '0', 10);
+    bounces = parseInt(contactosMatches[4]?.[1]?.replace(/\./g, '') || '0', 10);
   }
 
-  for (const pattern of aberturasPatterns) {
-    aberturasUnicas = extractContactsNumber(text, pattern);
-    if (aberturasUnicas !== null) break;
-  }
-
-  for (const pattern of cliquesPatterns) {
-    cliquesUnicos = extractContactsNumber(text, pattern);
-    if (cliquesUnicos !== null) break;
-  }
-
-  for (const pattern of remocoesPatterns) {
-    remocoes = extractContactsNumber(text, pattern);
-    if (remocoes !== null) break;
-  }
-
-  for (const pattern of bouncesPatterns) {
-    bounces = extractContactsNumber(text, pattern);
-    if (bounces !== null) break;
+  // 5. Validate minimum data - we need at least "enviados"
+  if (enviados === null || enviados === 0) {
+    // Last resort: try first number in the text
+    const firstNumberMatch = text.match(/(\d+)/);
+    if (firstNumberMatch) {
+      enviados = parseInt(firstNumberMatch[1], 10);
+    }
+    if (!enviados || enviados === 0) {
+      return null;
+    }
   }
 
   console.log('Extracted values:', { enviados, entregues, aberturasUnicas, cliquesUnicos, remocoes, bounces });
 
-  // If we couldn't extract the minimum required metrics, return null
-  if (enviados === null) {
-    return null;
-  }
-
-  // Use defaults for missing values
-  const finalMetrics = {
-    enviados: enviados ?? 0,
-    entregues: entregues ?? 0,
-    aberturasUnicas: aberturasUnicas ?? 0,
-    cliquesUnicos: cliquesUnicos ?? 0,
-    remocoes: remocoes ?? 0,
-    bounces: bounces ?? 0,
+  // 6. Calculate rates according to specifications
+  const finalMetrics: ExtractedMetrics = {
+    enviados: enviados || 0,
+    entregues: entregues || 0,
+    aberturasUnicas: aberturasUnicas || 0,
+    cliquesUnicos: cliquesUnicos || 0,
+    remocoes: remocoes || 0,
+    bounces: bounces || 0,
     // Calculate rates
     taxaEntrega: 0,
     taxaAbertura: 0,
@@ -146,15 +137,19 @@ function parseEgoiText(text: string): ExtractedMetrics | null {
     taxaBounce: 0,
   };
 
-  // Calculate rates according to user's specifications
+  // Taxa de Entrega = Entregues / Enviados
   if (finalMetrics.enviados > 0) {
     finalMetrics.taxaEntrega = (finalMetrics.entregues / finalMetrics.enviados) * 100;
   }
+  // Taxa de Abertura = Aberturas Únicas / Entregues
+  // Taxa de Saída = Remoções / Entregues
+  // Taxa de Bounce = Bounces / Entregues
   if (finalMetrics.entregues > 0) {
     finalMetrics.taxaAbertura = (finalMetrics.aberturasUnicas / finalMetrics.entregues) * 100;
     finalMetrics.taxaSaida = (finalMetrics.remocoes / finalMetrics.entregues) * 100;
     finalMetrics.taxaBounce = (finalMetrics.bounces / finalMetrics.entregues) * 100;
   }
+  // Taxa de Cliques = Cliques Únicos / Aberturas Únicas
   if (finalMetrics.aberturasUnicas > 0) {
     finalMetrics.taxaCliques = (finalMetrics.cliquesUnicos / finalMetrics.aberturasUnicas) * 100;
   }
