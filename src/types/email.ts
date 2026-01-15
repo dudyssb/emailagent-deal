@@ -30,17 +30,25 @@ export interface CampaignMetrics {
   nomeInterno: string;
   data: string;
   segmento: Segment;
+  // Raw counts
+  enviados: number;
+  entregues: number;
+  aberturasUnicas: number;
+  cliquesUnicos: number;
+  remocoes: number;
+  bounces: number;
+  // Legacy fields for compatibility
   mensagensEnviadas: number;
   aberturas: number;
-  aberturasUnicas: number;
   hardBounces: number;
   softBounces: number;
   cliques: number;
-  cliquesUnicos: number;
   // Calculated rates
   taxaEntrega: number;
   taxaAbertura: number;
   taxaCliques: number;
+  taxaSaida: number;
+  taxaBounce: number;
   totalBounces: number;
 }
 

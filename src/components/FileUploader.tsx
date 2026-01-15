@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 import { Button } from './ui/button';
 
 interface FileUploaderProps {
-  onFileLoad: (content: string) => void;
+  onFileLoad: (content: string, file?: File) => void;
   isLoading?: boolean;
   acceptedTypes?: string[];
   showReupload?: boolean;
@@ -36,10 +36,16 @@ export function FileUploader({
     setError(null);
     setFileName(file.name);
 
+    // For image files, pass them directly without reading as text
+    if (file.type.startsWith('image/')) {
+      onFileLoad('', file);
+      return;
+    }
+
     const reader = new FileReader();
     reader.onload = (e) => {
       const content = e.target?.result as string;
-      onFileLoad(content);
+      onFileLoad(content, file);
     };
     reader.onerror = () => {
       setError('Erro ao ler o arquivo.');
