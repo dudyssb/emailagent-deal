@@ -28,6 +28,30 @@ export default function Index() {
     'Tech/Indústria/Inovação': 0,
     'Outros': 0,
   });
+
+  const updateSegmentCounts = useCallback((contactList: EmailContact[]) => {
+    const counts: Record<Segment, number> = {
+      'Mercado Financeiro': 0,
+      'Agro/relacionados': 0,
+      'Varejo': 0,
+      'Tech/Indústria/Inovação': 0,
+      'Outros': 0,
+    };
+    contactList.forEach(c => {
+      if (c.segmento) counts[c.segmento]++;
+    });
+    setSegmentCounts(counts);
+  }, []);
+
+  const handleUpdateContactSegment = useCallback((email: string, newSegment: Segment) => {
+    setContacts(prev => {
+      const updated = prev.map(c => 
+        c.email === email ? { ...c, segmento: newSegment } : c
+      );
+      updateSegmentCounts(updated);
+      return updated;
+    });
+  }, [updateSegmentCounts]);
   const [selectedSegment, setSelectedSegment] = useState<Segment | null>(null);
   const [generatedEmails, setGeneratedEmails] = useState<NurturingEmail[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -94,7 +118,12 @@ export default function Index() {
               </p>
             </div>
 
-            <FileUploader onFileLoad={handleFileLoad} isLoading={isProcessing} />
+            <FileUploader 
+              onFileLoad={handleFileLoad} 
+              isLoading={isProcessing} 
+              showReupload={hasData}
+              requiredColumns="Colunas obrigatórias: nome e email"
+            />
 
             {errors.length > 0 && <ErrorList errors={errors} />}
 
@@ -153,7 +182,11 @@ export default function Index() {
                 />
               </div>
               <div className="lg:col-span-3">
-                <ContactsTable contacts={contacts} selectedSegment={selectedSegment} />
+                <ContactsTable 
+                  contacts={contacts} 
+                  selectedSegment={selectedSegment} 
+                  onUpdateSegment={handleUpdateContactSegment}
+                />
               </div>
             </div>
           </div>

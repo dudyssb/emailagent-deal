@@ -1,9 +1,11 @@
 import { CampaignMetrics, Segment, ValidationError } from '@/types/email';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell, PieChart, Pie } from 'recharts';
-import { TrendingUp, Mail, MousePointer, AlertTriangle, Send, FileSpreadsheet, Calendar, Users } from 'lucide-react';
+import { TrendingUp, Mail, MousePointer, AlertTriangle, Send, FileSpreadsheet, Calendar, Users, RefreshCw } from 'lucide-react';
 import { FileUploader } from './FileUploader';
 import { ErrorList } from './ErrorList';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { useState } from 'react';
 
 interface MetricsDashboardProps {
   metrics: CampaignMetrics[];
@@ -21,6 +23,43 @@ const SEGMENT_COLORS: Record<Segment, string> = {
 };
 
 export function MetricsDashboard({ metrics, errors = [], onFileLoad, isLoading }: MetricsDashboardProps) {
+  const [showUploader, setShowUploader] = useState(metrics.length === 0);
+
+  // Show uploader state when metrics are loaded but user wants to reupload
+  if (showUploader && metrics.length > 0) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
+            <FileSpreadsheet className="w-5 h-5 text-primary" />
+            Importar Novas Métricas
+          </h3>
+          <Button variant="outline" size="sm" onClick={() => setShowUploader(false)}>
+            Cancelar
+          </Button>
+        </div>
+        {onFileLoad && (
+          <div className="rounded-xl border border-border bg-card p-6">
+            <p className="text-sm text-muted-foreground mb-4">
+              Faça upload do CSV exportado da E-goi. O arquivo pode conter quaisquer colunas, mas identificamos automaticamente:{' '}
+              <code className="bg-muted px-1.5 py-0.5 rounded text-xs">mensagens enviadas</code> ou{' '}
+              <code className="bg-muted px-1.5 py-0.5 rounded text-xs">emails enviados</code> para calcular taxas.
+            </p>
+            <FileUploader 
+              onFileLoad={(content) => {
+                onFileLoad(content);
+                setShowUploader(false);
+              }} 
+              isLoading={isLoading}
+              acceptedTypes={['.csv', '.pdf']}
+            />
+          </div>
+        )}
+        {errors.length > 0 && <ErrorList errors={errors} />}
+      </div>
+    );
+  }
+
   if (metrics.length === 0) {
     return (
       <div className="space-y-6">
@@ -32,24 +71,19 @@ export function MetricsDashboard({ metrics, errors = [], onFileLoad, isLoading }
                 <h3 className="text-lg font-semibold text-foreground">Importar Métricas E-goi</h3>
               </div>
               <p className="text-sm text-muted-foreground mb-4">
-                Faça upload do CSV exportado da E-goi com as colunas:{' '}
-                <code className="bg-muted px-1.5 py-0.5 rounded text-xs">id</code>,{' '}
-                <code className="bg-muted px-1.5 py-0.5 rounded text-xs">lista</code>,{' '}
-                <code className="bg-muted px-1.5 py-0.5 rounded text-xs">assunto</code>,{' '}
-                <code className="bg-muted px-1.5 py-0.5 rounded text-xs">nome interno</code>,{' '}
-                <code className="bg-muted px-1.5 py-0.5 rounded text-xs">data</code>,{' '}
-                <code className="bg-muted px-1.5 py-0.5 rounded text-xs">mensagens enviadas</code>,{' '}
-                <code className="bg-muted px-1.5 py-0.5 rounded text-xs">aberturas</code>,{' '}
-                <code className="bg-muted px-1.5 py-0.5 rounded text-xs">aberturas únicas</code>,{' '}
-                <code className="bg-muted px-1.5 py-0.5 rounded text-xs">hard bounces</code>,{' '}
-                <code className="bg-muted px-1.5 py-0.5 rounded text-xs">soft bounces</code>,{' '}
-                <code className="bg-muted px-1.5 py-0.5 rounded text-xs">cliques</code>,{' '}
-                <code className="bg-muted px-1.5 py-0.5 rounded text-xs">cliques únicos</code>
+                Faça upload do CSV ou PDF exportado da E-goi. O arquivo pode conter quaisquer colunas - 
+                identificamos automaticamente os dados disponíveis. Para calcular taxas, buscamos por:{' '}
+                <code className="bg-muted px-1.5 py-0.5 rounded text-xs">mensagens enviadas</code> ou{' '}
+                <code className="bg-muted px-1.5 py-0.5 rounded text-xs">emails enviados</code>.
               </p>
               <p className="text-xs text-muted-foreground mb-4">
                 O segmento será identificado automaticamente a partir do campo "nome interno" da campanha.
               </p>
-              <FileUploader onFileLoad={onFileLoad} isLoading={isLoading} />
+              <FileUploader 
+                onFileLoad={onFileLoad} 
+                isLoading={isLoading}
+                acceptedTypes={['.csv', '.pdf']}
+              />
             </div>
             
             {errors.length > 0 && <ErrorList errors={errors} />}
@@ -125,9 +159,17 @@ export function MetricsDashboard({ metrics, errors = [], onFileLoad, isLoading }
           <TrendingUp className="w-5 h-5 text-primary" />
           Dashboard de Métricas E-goi
         </h3>
-        <span className="text-sm text-muted-foreground">
-          {metrics.length} campanha{metrics.length !== 1 ? 's' : ''} importada{metrics.length !== 1 ? 's' : ''}
-        </span>
+        <div className="flex items-center gap-4">
+          {onFileLoad && (
+            <Button variant="outline" size="sm" onClick={() => setShowUploader(true)} className="gap-2">
+              <RefreshCw className="w-4 h-4" />
+              Importar outro arquivo
+            </Button>
+          )}
+          <span className="text-sm text-muted-foreground">
+            {metrics.length} campanha{metrics.length !== 1 ? 's' : ''} importada{metrics.length !== 1 ? 's' : ''}
+          </span>
+        </div>
       </div>
 
       {/* Summary Cards */}
