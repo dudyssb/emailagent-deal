@@ -598,15 +598,7 @@ export function parseMetricsCSV(csvContent: string): MetricsProcessingResult {
   const cliquesIndex = findColumnIndex(header, EGOI_COLUMNS.cliques);
   const cliquesUnicosIndex = findColumnIndex(header, EGOI_COLUMNS.cliquesUnicos);
 
-  // Only require mensagensEnviadas to calculate rates - other columns are optional
-  if (mensagensEnviadasIndex === -1) {
-    errors.push({
-      linha_afetada: 1,
-      campo: 'cabeçalho',
-      mensagem_erro: `Coluna "mensagens enviadas" ou "emails enviados" não encontrada. Colunas do arquivo: ${header.join(', ')}`,
-    });
-    return { metrics, errors };
-  }
+  // All columns are optional - parse whatever is available
 
   // Parse data rows
   for (let i = 1; i < lines.length; i++) {
