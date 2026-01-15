@@ -627,12 +627,20 @@ export function parseMetricsCSV(csvContent: string): MetricsProcessingResult {
     const cliques = parseInt(cliquesRaw.replace(/[^\d]/g, ''), 10) || 0;
     const cliquesUnicos = parseInt(cliquesUnicosRaw.replace(/[^\d]/g, ''), 10) || 0;
 
-    // Calculate rates
+    // Calculate rates according to user's specifications:
+    // Taxa de Entrega = Entregues / Enviados
+    // Taxa de Abertura = Aberturas Únicas / Entregues
+    // Taxa de Cliques = Cliques Únicos / Aberturas Únicas
     const totalBounces = hardBounces + softBounces;
+    const enviados = mensagensEnviadas;
     const entregues = mensagensEnviadas - totalBounces;
-    const taxaEntrega = mensagensEnviadas > 0 ? (entregues / mensagensEnviadas) * 100 : 0;
+    const remocoes = 0; // Not available in CSV export typically
+    
+    const taxaEntrega = enviados > 0 ? (entregues / enviados) * 100 : 0;
     const taxaAbertura = entregues > 0 ? (aberturasUnicas / entregues) * 100 : 0;
-    const taxaCliques = entregues > 0 ? (cliquesUnicos / entregues) * 100 : 0;
+    const taxaCliques = aberturasUnicas > 0 ? (cliquesUnicos / aberturasUnicas) * 100 : 0;
+    const taxaSaida = entregues > 0 ? (remocoes / entregues) * 100 : 0;
+    const taxaBounce = entregues > 0 ? (totalBounces / entregues) * 100 : 0;
 
     // Categorize segment from nome interno
     const segmento = categorizeByNomeInterno(nomeInterno);
@@ -644,16 +652,25 @@ export function parseMetricsCSV(csvContent: string): MetricsProcessingResult {
       nomeInterno,
       data,
       segmento,
+      // Raw counts
+      enviados,
+      entregues,
+      aberturasUnicas,
+      cliquesUnicos,
+      remocoes,
+      bounces: totalBounces,
+      // Legacy fields
       mensagensEnviadas,
       aberturas,
-      aberturasUnicas,
       hardBounces,
       softBounces,
       cliques,
-      cliquesUnicos,
+      // Calculated rates
       taxaEntrega,
       taxaAbertura,
       taxaCliques,
+      taxaSaida,
+      taxaBounce,
       totalBounces,
     });
   }

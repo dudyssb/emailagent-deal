@@ -59,7 +59,7 @@ export default function Index() {
   const [metricsErrors, setMetricsErrors] = useState<ValidationError[]>([]);
   const [isProcessingMetrics, setIsProcessingMetrics] = useState(false);
 
-  const handleFileLoad = useCallback((content: string) => {
+  const handleFileLoad = useCallback((content: string, file?: File) => {
     setIsProcessing(true);
     
     setTimeout(() => {
