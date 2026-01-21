@@ -9,6 +9,7 @@ import { Button } from './ui/button';
 interface ContactsTableProps {
   contacts: EmailContact[];
   selectedSegment?: Segment | null;
+  onSelectSegment?: (segment: Segment | null) => void;
   onUpdateSegment?: (email: string, newSegment: Segment) => void;
 }
 
@@ -20,7 +21,7 @@ const SEGMENTS: Segment[] = [
   'Outros',
 ];
 
-export function ContactsTable({ contacts, selectedSegment, onUpdateSegment }: ContactsTableProps) {
+export function ContactsTable({ contacts, selectedSegment, onSelectSegment, onUpdateSegment }: ContactsTableProps) {
   const [search, setSearch] = useState('');
   const [editingEmail, setEditingEmail] = useState<string | null>(null);
   const [pendingSegment, setPendingSegment] = useState<Segment | null>(null);
@@ -64,8 +65,8 @@ export function ContactsTable({ contacts, selectedSegment, onUpdateSegment }: Co
 
   return (
     <div className="space-y-4 animate-slide-up">
-      <div className="flex items-center gap-4">
-        <div className="relative flex-1">
+      <div className="flex items-center gap-4 flex-wrap">
+        <div className="relative flex-1 min-w-[200px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
             placeholder="Buscar por nome ou e-mail..."
@@ -74,6 +75,26 @@ export function ContactsTable({ contacts, selectedSegment, onUpdateSegment }: Co
             className="pl-10"
           />
         </div>
+        
+        {onSelectSegment && (
+          <Select
+            value={selectedSegment || 'all'}
+            onValueChange={(value) => onSelectSegment(value === 'all' ? null : value as Segment)}
+          >
+            <SelectTrigger className="w-[200px]">
+              <SelectValue placeholder="Filtrar por segmento" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todos os segmentos</SelectItem>
+              {SEGMENTS.map(seg => (
+                <SelectItem key={seg} value={seg}>
+                  {seg}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        )}
+        
         <p className="text-sm text-muted-foreground whitespace-nowrap">
           {filteredContacts.length} contatos
         </p>

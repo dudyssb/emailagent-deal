@@ -184,7 +184,8 @@ export default function Index() {
               <div className="lg:col-span-3">
                 <ContactsTable 
                   contacts={contacts} 
-                  selectedSegment={selectedSegment} 
+                  selectedSegment={selectedSegment}
+                  onSelectSegment={setSelectedSegment}
                   onUpdateSegment={handleUpdateContactSegment}
                 />
               </div>
