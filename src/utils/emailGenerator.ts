@@ -6,6 +6,15 @@ const SENDER_INFO = {
   phone: '(41) 99156-0342',
 };
 
+// Mapeamento de segmentos para versão curta usada no email 1
+const SEGMENT_SHORT_NAMES: Record<Segment, string> = {
+  'Mercado Financeiro': 'finance',
+  'Agro/relacionados': 'agro',
+  'Varejo': 'varejo',
+  'Tech/Indústria/Inovação': 'inovação',
+  'Outros': 'negócios',
+};
+
 const SEGMENT_PAIN_POINTS: Record<Segment, string[]> = {
   'Mercado Financeiro': [
     'conformidade regulatória e auditorias',
@@ -39,47 +48,199 @@ const SEGMENT_PAIN_POINTS: Record<Segment, string[]> = {
   ],
 };
 
-const EMAIL_TEMPLATES = [
-  {
-    subject: (contact: EmailContact) => 
-      `${contact.nome}, uma parceria estratégica para ${contact.segmento}`,
-    getContent: (contact: EmailContact, painPoint: string) => `
+// Cases de sucesso reais mapeados por relevância de segmento
+interface SuccessCase {
+  empresa: string;
+  resultados: string[];
+  destaque: string;
+}
+
+const SEGMENT_SUCCESS_CASES: Record<Segment, SuccessCase> = {
+  'Mercado Financeiro': {
+    empresa: 'Digio',
+    resultados: [
+      '42% de redução de custos e tempo de desenvolvimento com a implementação do Design System',
+      'Refatoração de features com redução de custos e aumento de performance e eficiência',
+      'Implementação de ecossistema modular escalável',
+      'Identidade e cultura de interfaces digitais unificadas para todos os canais, potencializando a estratégia omnichannel',
+    ],
+    destaque: 'redução de 42% nos custos de desenvolvimento e uma experiência digital unificada em todos os canais',
+  },
+  'Agro/relacionados': {
+    empresa: 'Travelex',
+    resultados: [
+      'Construção do motor de cobrança e conversão de câmbio em tempo real em 60 dias, partindo do zero',
+      'Melhoria de 80% em turnover e aumento de performance dos times',
+      'Transformação ágil e digital com roadmaps implementados',
+    ],
+    destaque: 'entrega de um motor de câmbio em tempo real em apenas 60 dias e melhoria de 80% na retenção de talentos',
+  },
+  'Varejo': {
+    empresa: 'Desty',
+    resultados: [
+      '164% da meta anual de aquisição de clientes em 15 dias',
+      'Plano estratégico e roadmap tecnológico estruturado para todas as squads',
+      'Esteira de desenvolvimento aderente a evolução do segmento',
+    ],
+    destaque: 'alcançar 164% da meta anual de aquisição de clientes em apenas 15 dias',
+  },
+  'Tech/Indústria/Inovação': {
+    empresa: 'Digio',
+    resultados: [
+      '42% de redução de custos e tempo de desenvolvimento com a implementação do Design System',
+      'Implementação de ecossistema modular escalável',
+      'Refatoração de features com aumento de performance e eficiência',
+    ],
+    destaque: 'redução de 42% no tempo de desenvolvimento através de um ecossistema modular escalável',
+  },
+  'Outros': {
+    empresa: 'Travelex',
+    resultados: [
+      'Construção do motor de cobrança e conversão de câmbio em tempo real em 60 dias',
+      'Melhoria de 80% em turnover e aumento de performance dos times',
+      'Transformação ágil e digital com roadmaps implementados',
+    ],
+    destaque: 'transformação digital completa com entrega em 60 dias e melhoria de 80% na performance dos times',
+  },
+};
+
+// Conteúdo do material exclusivo para o email 3 (placeholder - será atualizado com o PDF)
+const EMAIL_3_MATERIAL: Record<Segment, { titulo: string; topicos: string[] }> = {
+  'Mercado Financeiro': {
+    titulo: 'Tendências de Transformação Digital no Setor Financeiro',
+    topicos: [
+      'Open Banking e integração de APIs',
+      'Automação de processos de compliance',
+      'Experiência digital do cliente bancário',
+      'Segurança cibernética e proteção de dados',
+    ],
+  },
+  'Agro/relacionados': {
+    titulo: 'Inovação Tecnológica no Agronegócio',
+    topicos: [
+      'Rastreabilidade e blockchain na cadeia produtiva',
+      'IoT e sensores para agricultura de precisão',
+      'Gestão integrada de operações rurais',
+      'Conectividade e soluções offline-first',
+    ],
+  },
+  'Varejo': {
+    titulo: 'O Futuro do Varejo Digital',
+    topicos: [
+      'Estratégias omnichannel de sucesso',
+      'Personalização da experiência do consumidor',
+      'Gestão inteligente de estoque',
+      'Integração de marketplaces',
+    ],
+  },
+  'Tech/Indústria/Inovação': {
+    titulo: 'Acelerando a Inovação Tecnológica',
+    topicos: [
+      'Design Systems e escalabilidade de produto',
+      'Metodologias ágeis para times de alta performance',
+      'Arquiteturas modernas e cloud-native',
+      'Estratégias de retenção de talentos tech',
+    ],
+  },
+  'Outros': {
+    titulo: 'Transformação Digital para Empresas',
+    topicos: [
+      'Modernização de processos corporativos',
+      'Cultura de inovação e agilidade',
+      'Gestão de dados e analytics',
+      'Automação e eficiência operacional',
+    ],
+  },
+};
+
+// Helper function to get short segment name
+function getShortSegmentName(segmento: Segment): string {
+  return SEGMENT_SHORT_NAMES[segmento] || 'negócios';
+}
+
+// Email 1: Parceria estratégica (usa nome curto do segmento)
+const emailTemplate1 = {
+  subject: (contact: EmailContact) => {
+    const shortName = getShortSegmentName(contact.segmento || 'Outros');
+    return `${contact.nome}, uma parceria estratégica para ${shortName}`;
+  },
+  getContent: (contact: EmailContact, painPoint: string) => {
+    const shortName = getShortSegmentName(contact.segmento || 'Outros');
+    return `
       <p>Olá ${contact.nome},</p>
-      <p>Notei que sua empresa atua no segmento de <strong>${contact.segmento}</strong> e sei que ${painPoint} é um desafio constante nesse setor.</p>
+      <p>Notei que sua empresa atua no segmento de <strong>${shortName}</strong> e sei que ${painPoint} é um desafio constante nesse setor.</p>
       <p>Na Deal, temos ajudado empresas como a sua a superar esses desafios através de soluções personalizadas de tecnologia e consultoria.</p>
       <p>Gostaria de agendar uma conversa rápida de 15 minutos para entender melhor o cenário atual da sua empresa?</p>
-    `,
+    `;
   },
-  {
-    subject: (contact: EmailContact) => 
-      `Case de sucesso: como empresas de ${contact.segmento} estão se transformando`,
-    getContent: (contact: EmailContact, painPoint: string) => `
-      <p>Olá ${contact.nome},</p>
-      <p>Recentemente, ajudamos uma empresa do segmento de ${contact.segmento} a resolver desafios relacionados a ${painPoint}.</p>
-      <p>O resultado? Redução de 40% nos custos operacionais e aumento de 25% na eficiência dos processos.</p>
-      <p>Posso compartilhar mais detalhes sobre como alcançamos esses resultados?</p>
-    `,
+};
+
+// Email 2: Case de sucesso real
+const emailTemplate2 = {
+  subject: (contact: EmailContact) => {
+    const successCase = SEGMENT_SUCCESS_CASES[contact.segmento || 'Outros'];
+    return `Case ${successCase.empresa}: resultados reais em transformação digital`;
   },
-  {
-    subject: (contact: EmailContact) => 
-      `${contact.nome}, insights exclusivos para ${contact.segmento}`,
-    getContent: (contact: EmailContact, painPoint: string) => `
+  getContent: (contact: EmailContact, _painPoint: string) => {
+    const successCase = SEGMENT_SUCCESS_CASES[contact.segmento || 'Outros'];
+    const resultadosHTML = successCase.resultados
+      .map(r => `<li>${r}</li>`)
+      .join('\n          ');
+    
+    return `
       <p>Olá ${contact.nome},</p>
-      <p>Preparamos um material exclusivo com tendências e insights para o segmento de ${contact.segmento}, especialmente focado em ${painPoint}.</p>
-      <p>Este conteúdo foi desenvolvido com base em nossa experiência com mais de 200 clientes do seu setor.</p>
+      <p>Gostaria de compartilhar um case real de sucesso que alcançamos com a <strong>${successCase.empresa}</strong>:</p>
+      <ul style="margin: 15px 0; padding-left: 20px;">
+        ${resultadosHTML}
+      </ul>
+      <p>O resultado? <strong>${successCase.destaque}</strong>.</p>
+      <p>Acredito que podemos alcançar resultados similares para sua empresa. Posso compartilhar mais detalhes sobre como chegamos nesses números?</p>
+    `;
+  },
+};
+
+// Email 3: Material exclusivo (será atualizado com conteúdo do PDF)
+const emailTemplate3 = {
+  subject: (contact: EmailContact) => {
+    const material = EMAIL_3_MATERIAL[contact.segmento || 'Outros'];
+    return `${contact.nome}, material exclusivo: ${material.titulo}`;
+  },
+  getContent: (contact: EmailContact, _painPoint: string) => {
+    const material = EMAIL_3_MATERIAL[contact.segmento || 'Outros'];
+    const topicosHTML = material.topicos
+      .map(t => `<li>${t}</li>`)
+      .join('\n          ');
+    
+    return `
+      <p>Olá ${contact.nome},</p>
+      <p>Preparamos um material exclusivo: <strong>"${material.titulo}"</strong></p>
+      <p>Neste conteúdo você vai encontrar:</p>
+      <ul style="margin: 15px 0; padding-left: 20px;">
+        ${topicosHTML}
+      </ul>
+      <p>Este material foi desenvolvido com base em nossa experiência com mais de 200 clientes e cases reais de sucesso.</p>
       <p>Gostaria de receber esse material? Posso enviá-lo diretamente para você.</p>
-    `,
+    `;
   },
-  {
-    subject: (contact: EmailContact) => 
-      `Última tentativa: vamos conversar, ${contact.nome}?`,
-    getContent: (contact: EmailContact, painPoint: string) => `
-      <p>Olá ${contact.nome},</p>
-      <p>Sei que sua agenda deve estar bastante cheia, mas acredito que uma conversa rápida sobre ${painPoint} pode trazer insights valiosos para sua empresa.</p>
-      <p>Se não for o momento ideal, sem problemas! Posso entrar em contato em uma data mais conveniente.</p>
-      <p>Quando seria um bom momento para conversarmos?</p>
-    `,
-  },
+};
+
+// Email 4: Última tentativa (mantido como original)
+const emailTemplate4 = {
+  subject: (contact: EmailContact) => 
+    `Última tentativa: vamos conversar, ${contact.nome}?`,
+  getContent: (contact: EmailContact, painPoint: string) => `
+    <p>Olá ${contact.nome},</p>
+    <p>Sei que sua agenda deve estar bastante cheia, mas acredito que uma conversa rápida sobre ${painPoint} pode trazer insights valiosos para sua empresa.</p>
+    <p>Se não for o momento ideal, sem problemas! Posso entrar em contato em uma data mais conveniente.</p>
+    <p>Quando seria um bom momento para conversarmos?</p>
+  `,
+};
+
+const EMAIL_TEMPLATES = [
+  emailTemplate1,
+  emailTemplate2,
+  emailTemplate3,
+  emailTemplate4,
 ];
 
 function generateEmailHTML(
@@ -117,6 +278,13 @@ function generateEmailHTML(
     }
     .content p {
       margin: 0 0 15px 0;
+    }
+    .content ul {
+      margin: 15px 0;
+      padding-left: 20px;
+    }
+    .content li {
+      margin-bottom: 8px;
     }
     .signature {
       border-top: 1px solid #eeeeee;
