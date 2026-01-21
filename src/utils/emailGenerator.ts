@@ -104,53 +104,14 @@ const SEGMENT_SUCCESS_CASES: Record<Segment, SuccessCase> = {
   },
 };
 
-// Conteúdo do material exclusivo para o email 3 (placeholder - será atualizado com o PDF)
-const EMAIL_3_MATERIAL: Record<Segment, { titulo: string; topicos: string[] }> = {
-  'Mercado Financeiro': {
-    titulo: 'Tendências de Transformação Digital no Setor Financeiro',
-    topicos: [
-      'Open Banking e integração de APIs',
-      'Automação de processos de compliance',
-      'Experiência digital do cliente bancário',
-      'Segurança cibernética e proteção de dados',
-    ],
-  },
-  'Agro/relacionados': {
-    titulo: 'Inovação Tecnológica no Agronegócio',
-    topicos: [
-      'Rastreabilidade e blockchain na cadeia produtiva',
-      'IoT e sensores para agricultura de precisão',
-      'Gestão integrada de operações rurais',
-      'Conectividade e soluções offline-first',
-    ],
-  },
-  'Varejo': {
-    titulo: 'O Futuro do Varejo Digital',
-    topicos: [
-      'Estratégias omnichannel de sucesso',
-      'Personalização da experiência do consumidor',
-      'Gestão inteligente de estoque',
-      'Integração de marketplaces',
-    ],
-  },
-  'Tech/Indústria/Inovação': {
-    titulo: 'Acelerando a Inovação Tecnológica',
-    topicos: [
-      'Design Systems e escalabilidade de produto',
-      'Metodologias ágeis para times de alta performance',
-      'Arquiteturas modernas e cloud-native',
-      'Estratégias de retenção de talentos tech',
-    ],
-  },
-  'Outros': {
-    titulo: 'Transformação Digital para Empresas',
-    topicos: [
-      'Modernização de processos corporativos',
-      'Cultura de inovação e agilidade',
-      'Gestão de dados e analytics',
-      'Automação e eficiência operacional',
-    ],
-  },
+// Conteúdo do material exclusivo para o email 3 - MIT-Deal: O impacto da IA na eficiência dos negócios
+const EMAIL_3_MATERIAL = {
+  titulo: 'O impacto da IA na eficiência dos negócios',
+  topicos: [
+    'A Inteligência Artificial como parte relevante no negócio de companhias em segmentos diversos',
+    'O uso produtivo da IA ancorado no manejo de dados (e os desafios envolvidos)',
+    'Amadurecimento da tecnologia no Brasil',
+  ],
 };
 
 // Helper function to get short segment name
@@ -199,26 +160,23 @@ const emailTemplate2 = {
   },
 };
 
-// Email 3: Material exclusivo (será atualizado com conteúdo do PDF)
+// Email 3: Material exclusivo - O impacto da IA na eficiência dos negócios
 const emailTemplate3 = {
-  subject: (contact: EmailContact) => {
-    const material = EMAIL_3_MATERIAL[contact.segmento || 'Outros'];
-    return `${contact.nome}, material exclusivo: ${material.titulo}`;
-  },
+  subject: (contact: EmailContact) => 
+    `${contact.nome}, material exclusivo: ${EMAIL_3_MATERIAL.titulo}`,
   getContent: (contact: EmailContact, _painPoint: string) => {
-    const material = EMAIL_3_MATERIAL[contact.segmento || 'Outros'];
-    const topicosHTML = material.topicos
+    const topicosHTML = EMAIL_3_MATERIAL.topicos
       .map(t => `<li>${t}</li>`)
       .join('\n          ');
     
     return `
       <p>Olá ${contact.nome},</p>
-      <p>Preparamos um material exclusivo: <strong>"${material.titulo}"</strong></p>
+      <p>Preparamos um material exclusivo: <strong>"${EMAIL_3_MATERIAL.titulo}"</strong></p>
       <p>Neste conteúdo você vai encontrar:</p>
       <ul style="margin: 15px 0; padding-left: 20px;">
         ${topicosHTML}
       </ul>
-      <p>Este material foi desenvolvido com base em nossa experiência com mais de 200 clientes e cases reais de sucesso.</p>
+      <p>Este material foi desenvolvido com base em nossa experiência com mais de 200 clientes e cases reais de sucesso, trazendo insights valiosos sobre como a IA está transformando empresas no Brasil.</p>
       <p>Gostaria de receber esse material? Posso enviá-lo diretamente para você.</p>
     `;
   },
