@@ -1,5 +1,8 @@
 import { EmailContact, NurturingEmail, Segment } from '@/types/email';
 
+// Variável E-goi para nome do lead
+const EGOI_NAME_VAR = '!fname';
+
 const SENDER_INFO = {
   name: 'Karine Casanova Soares',
   email: 'karine.soares@deal.com.br',
@@ -121,14 +124,14 @@ function getShortSegmentName(segmento: Segment): string {
 
 // Email 1: Parceria estratégica (usa nome curto do segmento)
 const emailTemplate1 = {
-  subject: (contact: EmailContact) => {
-    const shortName = getShortSegmentName(contact.segmento || 'Outros');
-    return `${contact.nome}, uma parceria estratégica para ${shortName}`;
+  subject: (segmento: Segment) => {
+    const shortName = getShortSegmentName(segmento);
+    return `${EGOI_NAME_VAR}, uma parceria estratégica para ${shortName}`;
   },
-  getContent: (contact: EmailContact, painPoint: string) => {
-    const shortName = getShortSegmentName(contact.segmento || 'Outros');
+  getContent: (segmento: Segment, painPoint: string) => {
+    const shortName = getShortSegmentName(segmento);
     return `
-      <p>Olá ${contact.nome},</p>
+      <p>Olá ${EGOI_NAME_VAR},</p>
       <p>Notei que sua empresa atua no segmento de <strong>${shortName}</strong> e sei que ${painPoint} é um desafio constante nesse setor.</p>
       <p>Na Deal, temos ajudado empresas como a sua a superar esses desafios através de soluções personalizadas de tecnologia e consultoria.</p>
       <p>Gostaria de agendar uma conversa rápida de 15 minutos para entender melhor o cenário atual da sua empresa?</p>
@@ -138,18 +141,18 @@ const emailTemplate1 = {
 
 // Email 2: Case de sucesso real
 const emailTemplate2 = {
-  subject: (contact: EmailContact) => {
-    const successCase = SEGMENT_SUCCESS_CASES[contact.segmento || 'Outros'];
+  subject: (segmento: Segment) => {
+    const successCase = SEGMENT_SUCCESS_CASES[segmento];
     return `Case ${successCase.empresa}: resultados reais em transformação digital`;
   },
-  getContent: (contact: EmailContact, _painPoint: string) => {
-    const successCase = SEGMENT_SUCCESS_CASES[contact.segmento || 'Outros'];
+  getContent: (segmento: Segment, _painPoint: string) => {
+    const successCase = SEGMENT_SUCCESS_CASES[segmento];
     const resultadosHTML = successCase.resultados
       .map(r => `<li>${r}</li>`)
       .join('\n          ');
     
     return `
-      <p>Olá ${contact.nome},</p>
+      <p>Olá ${EGOI_NAME_VAR},</p>
       <p>Gostaria de compartilhar um case real de sucesso que alcançamos com a <strong>${successCase.empresa}</strong>:</p>
       <ul style="margin: 15px 0; padding-left: 20px;">
         ${resultadosHTML}
@@ -162,15 +165,15 @@ const emailTemplate2 = {
 
 // Email 3: Material exclusivo - O impacto da IA na eficiência dos negócios
 const emailTemplate3 = {
-  subject: (contact: EmailContact) => 
-    `${contact.nome}, material exclusivo: ${EMAIL_3_MATERIAL.titulo}`,
-  getContent: (contact: EmailContact, _painPoint: string) => {
+  subject: (_segmento: Segment) => 
+    `${EGOI_NAME_VAR}, material exclusivo: ${EMAIL_3_MATERIAL.titulo}`,
+  getContent: (_segmento: Segment, _painPoint: string) => {
     const topicosHTML = EMAIL_3_MATERIAL.topicos
       .map(t => `<li>${t}</li>`)
       .join('\n          ');
     
     return `
-      <p>Olá ${contact.nome},</p>
+      <p>Olá ${EGOI_NAME_VAR},</p>
       <p>Preparamos um material exclusivo: <strong>"${EMAIL_3_MATERIAL.titulo}"</strong></p>
       <p>Neste conteúdo você vai encontrar:</p>
       <ul style="margin: 15px 0; padding-left: 20px;">
@@ -184,10 +187,10 @@ const emailTemplate3 = {
 
 // Email 4: Última tentativa (mantido como original)
 const emailTemplate4 = {
-  subject: (contact: EmailContact) => 
-    `Última tentativa: vamos conversar, ${contact.nome}?`,
-  getContent: (contact: EmailContact, painPoint: string) => `
-    <p>Olá ${contact.nome},</p>
+  subject: (_segmento: Segment) => 
+    `Última tentativa: vamos conversar, ${EGOI_NAME_VAR}?`,
+  getContent: (_segmento: Segment, painPoint: string) => `
+    <p>Olá ${EGOI_NAME_VAR},</p>
     <p>Sei que sua agenda deve estar bastante cheia, mas acredito que uma conversa rápida sobre ${painPoint} pode trazer insights valiosos para sua empresa.</p>
     <p>Se não for o momento ideal, sem problemas! Posso entrar em contato em uma data mais conveniente.</p>
     <p>Quando seria um bom momento para conversarmos?</p>
@@ -203,8 +206,7 @@ const EMAIL_TEMPLATES = [
 
 function generateEmailHTML(
   subject: string,
-  bodyContent: string,
-  contact: EmailContact
+  bodyContent: string
 ): string {
   return `<!DOCTYPE html>
 <html lang="pt-BR">
@@ -305,29 +307,39 @@ function generateEmailHTML(
 </html>`;
 }
 
-export function generateNurturingEmails(contact: EmailContact): NurturingEmail[] {
-  const painPoints = SEGMENT_PAIN_POINTS[contact.segmento || 'Outros'];
+// Gera 4 templates de email para um segmento (usando !fname como variável E-goi)
+export function generateSegmentEmailTemplates(segment: Segment): NurturingEmail[] {
+  const painPoints = SEGMENT_PAIN_POINTS[segment];
   
   return EMAIL_TEMPLATES.map((template, index) => {
     const painPoint = painPoints[index % painPoints.length];
-    const subject = template.subject(contact);
-    const bodyContent = template.getContent(contact, painPoint);
-    const htmlContent = generateEmailHTML(subject, bodyContent, contact);
+    const subject = template.subject(segment);
+    const bodyContent = template.getContent(segment, painPoint);
+    const htmlContent = generateEmailHTML(subject, bodyContent);
 
     return {
-      id: `${contact.email}-${index + 1}`,
+      id: `${segment}-email-${index + 1}`,
       subject,
       htmlContent,
-      targetContact: contact,
+      targetContact: { nome: EGOI_NAME_VAR, email: '', segmento: segment },
       sequence: index + 1,
     };
   });
 }
 
+// Mantém compatibilidade - agora gera templates por segmento ao invés de por lead
 export function generateAllEmailsForSegment(
-  contacts: EmailContact[],
+  _contacts: EmailContact[],
   segment: Segment
 ): NurturingEmail[] {
-  const segmentContacts = contacts.filter(c => c.segmento === segment);
-  return segmentContacts.flatMap(contact => generateNurturingEmails(contact));
+  return generateSegmentEmailTemplates(segment);
 }
+
+// Exporta todos os segmentos disponíveis
+export const ALL_SEGMENTS: Segment[] = [
+  'Mercado Financeiro',
+  'Agro/relacionados',
+  'Varejo',
+  'Tech/Indústria/Inovação',
+  'Outros',
+];
