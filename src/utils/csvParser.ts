@@ -1,4 +1,8 @@
 import { EmailContact, ValidationError, Segment, ProcessingResult, CampaignMetrics } from '@/types/email';
+import { 
+  categorizeByDomainEnhanced, 
+  categorizeByNomeInternoEnhanced 
+} from './segmentationKeywords';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -391,37 +395,14 @@ const NOME_INTERNO_SEGMENT_MAP: Record<string, Segment> = {
   'manufatura': 'Tech/Indústria/Inovação',
 };
 
+// Usa a nova função aprimorada de segmentação
 export function categorizeByDomain(email: string): Segment {
-  const domain = email.split('@')[1]?.toLowerCase() || '';
-  const domainName = domain.split('.')[0] || '';
-  
-  // First, check for known companies (exact or contains match)
-  for (const [company, segment] of Object.entries(KNOWN_COMPANIES)) {
-    if (domainName.includes(company) || domain.includes(company)) {
-      return segment;
-    }
-  }
-  
-  // Then check for keyword patterns
-  for (const [keyword, segment] of Object.entries(DOMAIN_SEGMENT_MAP)) {
-    if (domain.includes(keyword)) {
-      return segment;
-    }
-  }
-  
-  return 'Outros';
+  return categorizeByDomainEnhanced(email);
 }
 
+// Usa a nova função aprimorada de segmentação por nome interno
 export function categorizeByNomeInterno(nomeInterno: string): Segment {
-  const normalized = nomeInterno.toLowerCase();
-  
-  for (const [keyword, segment] of Object.entries(NOME_INTERNO_SEGMENT_MAP)) {
-    if (normalized.includes(keyword)) {
-      return segment;
-    }
-  }
-  
-  return 'Outros';
+  return categorizeByNomeInternoEnhanced(nomeInterno);
 }
 
 export function validateEmail(email: string): boolean {
