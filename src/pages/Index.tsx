@@ -8,8 +8,9 @@ import { ContactsTable } from '@/components/ContactsTable';
 import { EmailPreview } from '@/components/EmailPreview';
 import { MetricsDashboard } from '@/components/MetricsDashboard';
 import { ExportPanel } from '@/components/ExportPanel';
+import { CaseSelection } from '@/components/CaseSelection';
 import { parseCSV, parseMetricsCSV } from '@/utils/csvParser';
-import { generateAllEmailsForSegment } from '@/utils/emailGenerator';
+import { generateAllEmailsForSegment, CaseResultType, EmailGenerationConfig } from '@/utils/emailGenerator';
 import { EmailContact, ValidationError, Segment, CampaignMetrics, NurturingEmail } from '@/types/email';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
@@ -53,6 +54,7 @@ export default function Index() {
     });
   }, [updateSegmentCounts]);
   const [selectedSegment, setSelectedSegment] = useState<Segment | null>(null);
+  const [selectedCaseResultType, setSelectedCaseResultType] = useState<CaseResultType | undefined>(undefined);
   const [generatedEmails, setGeneratedEmails] = useState<NurturingEmail[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [metrics, setMetrics] = useState<CampaignMetrics[]>([]);
@@ -77,6 +79,8 @@ export default function Index() {
 
   const handleSegmentSelect = useCallback((segment: Segment) => {
     setSelectedSegment(segment === selectedSegment ? null : segment);
+    // Reset case type when changing segment
+    setSelectedCaseResultType(undefined);
   }, [selectedSegment]);
 
   const handleLogout = useCallback(() => {
@@ -87,10 +91,14 @@ export default function Index() {
   const handleGenerateEmails = useCallback(() => {
     if (!selectedSegment) return;
     
-    const emails = generateAllEmailsForSegment(contacts, selectedSegment);
+    const config: Partial<EmailGenerationConfig> = {
+      selectedCaseResultType,
+    };
+    
+    const emails = generateAllEmailsForSegment(contacts, selectedSegment, config);
     setGeneratedEmails(emails);
     setActiveTab('emails');
-  }, [contacts, selectedSegment]);
+  }, [contacts, selectedSegment, selectedCaseResultType]);
 
   const handleMetricsFileLoad = useCallback((content: string) => {
     setIsProcessingMetrics(true);
@@ -136,18 +144,26 @@ export default function Index() {
                 />
 
                 {selectedSegment && (
-                  <div className="flex flex-col justify-center items-center p-8 rounded-xl border border-primary/20 bg-primary/5">
-                    <Sparkles className="w-12 h-12 text-primary mb-4" />
-                    <h3 className="text-lg font-semibold text-foreground mb-2">
-                      Gerar E-mails para {selectedSegment.split('/')[0]}
-                    </h3>
-                    <p className="text-sm text-muted-foreground text-center mb-4">
-                      {segmentCounts[selectedSegment]} contatos serão nutridos com 4 e-mails personalizados cada.
-                    </p>
-                    <Button onClick={handleGenerateEmails} size="lg">
-                      <Sparkles className="w-4 h-4 mr-2" />
-                      Gerar E-mails de Nutrição
-                    </Button>
+                  <div className="space-y-4">
+                    <CaseSelection
+                      segment={selectedSegment}
+                      selectedResultType={selectedCaseResultType}
+                      onSelectResultType={setSelectedCaseResultType}
+                    />
+                    
+                    <div className="flex flex-col justify-center items-center p-6 rounded-xl border border-primary/20 bg-primary/5">
+                      <Sparkles className="w-10 h-10 text-primary mb-3" />
+                      <h3 className="text-lg font-semibold text-foreground mb-2">
+                        Gerar E-mails para {selectedSegment.split('/')[0]}
+                      </h3>
+                      <p className="text-sm text-muted-foreground text-center mb-4">
+                        {segmentCounts[selectedSegment]} contatos serão nutridos com 4 e-mails personalizados.
+                      </p>
+                      <Button onClick={handleGenerateEmails} size="lg">
+                        <Sparkles className="w-4 h-4 mr-2" />
+                        Gerar E-mails de Nutrição
+                      </Button>
+                    </div>
                   </div>
                 )}
               </div>

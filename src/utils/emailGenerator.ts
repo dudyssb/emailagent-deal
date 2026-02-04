@@ -1,4 +1,18 @@
 import { EmailContact, NurturingEmail, Segment } from '@/types/email';
+import { 
+  SUCCESS_CASES, 
+  SuccessCase, 
+  CaseResultType, 
+  RESULT_TYPE_LABELS,
+  getCasesBySegment,
+  getBestCaseForSegment,
+  getAvailableResultTypes 
+} from '@/data/successCases';
+import { 
+  RichMaterial,
+  getMaterialsBySegment,
+  selectBestMaterialForSegment 
+} from '@/data/richMaterials';
 
 // Variável E-goi para nome do lead
 const EGOI_NAME_VAR = '!fname';
@@ -51,75 +65,16 @@ const SEGMENT_PAIN_POINTS: Record<Segment, string[]> = {
   ],
 };
 
-// Cases de sucesso reais mapeados por relevância de segmento
-interface SuccessCase {
-  empresa: string;
-  resultados: string[];
-  destaque: string;
-}
-
-const SEGMENT_SUCCESS_CASES: Record<Segment, SuccessCase> = {
-  'Mercado Financeiro': {
-    empresa: 'Digio',
-    resultados: [
-      '42% de redução de custos e tempo de desenvolvimento com a implementação do Design System',
-      'Refatoração de features com redução de custos e aumento de performance e eficiência',
-      'Implementação de ecossistema modular escalável',
-      'Identidade e cultura de interfaces digitais unificadas para todos os canais, potencializando a estratégia omnichannel',
-    ],
-    destaque: 'redução de 42% nos custos de desenvolvimento e uma experiência digital unificada em todos os canais',
-  },
-  'Agro/relacionados': {
-    empresa: 'Travelex',
-    resultados: [
-      'Construção do motor de cobrança e conversão de câmbio em tempo real em 60 dias, partindo do zero',
-      'Melhoria de 80% em turnover e aumento de performance dos times',
-      'Transformação ágil e digital com roadmaps implementados',
-    ],
-    destaque: 'entrega de um motor de câmbio em tempo real em apenas 60 dias e melhoria de 80% na retenção de talentos',
-  },
-  'Varejo': {
-    empresa: 'Desty',
-    resultados: [
-      '164% da meta anual de aquisição de clientes em 15 dias',
-      'Plano estratégico e roadmap tecnológico estruturado para todas as squads',
-      'Esteira de desenvolvimento aderente a evolução do segmento',
-    ],
-    destaque: 'alcançar 164% da meta anual de aquisição de clientes em apenas 15 dias',
-  },
-  'Tech/Indústria/Inovação': {
-    empresa: 'Digio',
-    resultados: [
-      '42% de redução de custos e tempo de desenvolvimento com a implementação do Design System',
-      'Implementação de ecossistema modular escalável',
-      'Refatoração de features com aumento de performance e eficiência',
-    ],
-    destaque: 'redução de 42% no tempo de desenvolvimento através de um ecossistema modular escalável',
-  },
-  'Outros': {
-    empresa: 'Travelex',
-    resultados: [
-      'Construção do motor de cobrança e conversão de câmbio em tempo real em 60 dias',
-      'Melhoria de 80% em turnover e aumento de performance dos times',
-      'Transformação ágil e digital com roadmaps implementados',
-    ],
-    destaque: 'transformação digital completa com entrega em 60 dias e melhoria de 80% na performance dos times',
-  },
-};
-
-// Conteúdo do material exclusivo para o email 3 - MIT-Deal: O impacto da IA na eficiência dos negócios
-const EMAIL_3_MATERIAL = {
-  titulo: 'O impacto da IA na eficiência dos negócios',
-  topicos: [
-    'A Inteligência Artificial como parte relevante no negócio de companhias em segmentos diversos',
-    'O uso produtivo da IA ancorado no manejo de dados (e os desafios envolvidos)',
-    'Amadurecimento da tecnologia no Brasil',
-  ],
-};
-
 // Helper function to get short segment name
 function getShortSegmentName(segmento: Segment): string {
   return SEGMENT_SHORT_NAMES[segmento] || 'negócios';
+}
+
+// Configuração de geração de emails
+export interface EmailGenerationConfig {
+  segment: Segment;
+  selectedCaseResultType?: CaseResultType;
+  companyContext?: string; // Para seleção automática de material
 }
 
 // Email 1: Parceria estratégica (usa nome curto do segmento)
@@ -128,7 +83,7 @@ const emailTemplate1 = {
     const shortName = getShortSegmentName(segmento);
     return `${EGOI_NAME_VAR}, uma parceria estratégica para ${shortName}`;
   },
-  getContent: (segmento: Segment, painPoint: string) => {
+  getContent: (segmento: Segment, painPoint: string, _config: EmailGenerationConfig) => {
     const shortName = getShortSegmentName(segmento);
     return `
       <p>Olá ${EGOI_NAME_VAR},</p>
@@ -139,15 +94,26 @@ const emailTemplate1 = {
   },
 };
 
-// Email 2: Case de sucesso real
+// Email 2: Case de sucesso (usa case selecionado ou automático)
 const emailTemplate2 = {
-  subject: (segmento: Segment) => {
-    const successCase = SEGMENT_SUCCESS_CASES[segmento];
+  subject: (segmento: Segment, config: EmailGenerationConfig) => {
+    const successCase = getBestCaseForSegment(segmento, config.selectedCaseResultType);
+    if (!successCase) return `Resultados reais em transformação digital`;
     return `Case ${successCase.empresa}: resultados reais em transformação digital`;
   },
-  getContent: (segmento: Segment, _painPoint: string) => {
-    const successCase = SEGMENT_SUCCESS_CASES[segmento];
+  getContent: (segmento: Segment, _painPoint: string, config: EmailGenerationConfig) => {
+    const successCase = getBestCaseForSegment(segmento, config.selectedCaseResultType);
+    
+    if (!successCase) {
+      return `
+        <p>Olá ${EGOI_NAME_VAR},</p>
+        <p>Gostaria de compartilhar alguns resultados que alcançamos com nossos clientes em transformação digital.</p>
+        <p>Acredito que podemos alcançar resultados similares para sua empresa. Posso compartilhar mais detalhes?</p>
+      `;
+    }
+
     const resultadosHTML = successCase.resultados
+      .slice(0, 4) // Máximo 4 resultados
       .map(r => `<li>${r}</li>`)
       .join('\n          ');
     
@@ -163,33 +129,38 @@ const emailTemplate2 = {
   },
 };
 
-// Email 3: Material exclusivo - O impacto da IA na eficiência dos negócios
+// Email 3: Material exclusivo (seleção automática baseada no contexto)
 const emailTemplate3 = {
-  subject: (_segmento: Segment) => 
-    `${EGOI_NAME_VAR}, material exclusivo: ${EMAIL_3_MATERIAL.titulo}`,
-  getContent: (_segmento: Segment, _painPoint: string) => {
-    const topicosHTML = EMAIL_3_MATERIAL.topicos
+  subject: (segmento: Segment, config: EmailGenerationConfig) => {
+    const material = selectBestMaterialForSegment(segmento, config.companyContext);
+    return `${EGOI_NAME_VAR}, material exclusivo: ${material.titulo}`;
+  },
+  getContent: (segmento: Segment, _painPoint: string, config: EmailGenerationConfig) => {
+    const material = selectBestMaterialForSegment(segmento, config.companyContext);
+    
+    const topicosHTML = material.topicos
+      .slice(0, 5) // Máximo 5 tópicos
       .map(t => `<li>${t}</li>`)
       .join('\n          ');
     
     return `
       <p>Olá ${EGOI_NAME_VAR},</p>
-      <p>Preparamos um material exclusivo: <strong>"${EMAIL_3_MATERIAL.titulo}"</strong></p>
+      <p>Preparamos um material exclusivo: <strong>"${material.titulo}"</strong></p>
       <p>Neste conteúdo você vai encontrar:</p>
       <ul style="margin: 15px 0; padding-left: 20px;">
         ${topicosHTML}
       </ul>
-      <p>Este material foi desenvolvido com base em nossa experiência com mais de 200 clientes e cases reais de sucesso, trazendo insights valiosos sobre como a IA está transformando empresas no Brasil.</p>
+      <p>Este material foi desenvolvido com base em nossa experiência com mais de 200 clientes e cases reais de sucesso.</p>
       <p>Gostaria de receber esse material? Posso enviá-lo diretamente para você.</p>
     `;
   },
 };
 
-// Email 4: Última tentativa (mantido como original)
+// Email 4: Última tentativa
 const emailTemplate4 = {
-  subject: (_segmento: Segment) => 
+  subject: (_segmento: Segment, _config: EmailGenerationConfig) => 
     `Última tentativa: vamos conversar, ${EGOI_NAME_VAR}?`,
-  getContent: (_segmento: Segment, painPoint: string) => `
+  getContent: (_segmento: Segment, painPoint: string, _config: EmailGenerationConfig) => `
     <p>Olá ${EGOI_NAME_VAR},</p>
     <p>Sei que sua agenda deve estar bastante cheia, mas acredito que uma conversa rápida sobre ${painPoint} pode trazer insights valiosos para sua empresa.</p>
     <p>Se não for o momento ideal, sem problemas! Posso entrar em contato em uma data mais conveniente.</p>
@@ -197,11 +168,16 @@ const emailTemplate4 = {
   `,
 };
 
-const EMAIL_TEMPLATES = [
-  emailTemplate1,
+interface EmailTemplate {
+  subject: (segmento: Segment, config: EmailGenerationConfig) => string;
+  getContent: (segmento: Segment, painPoint: string, config: EmailGenerationConfig) => string;
+}
+
+const EMAIL_TEMPLATES: EmailTemplate[] = [
+  emailTemplate1 as EmailTemplate,
   emailTemplate2,
   emailTemplate3,
-  emailTemplate4,
+  emailTemplate4 as EmailTemplate,
 ];
 
 function generateEmailHTML(
@@ -307,14 +283,21 @@ function generateEmailHTML(
 </html>`;
 }
 
-// Gera 4 templates de email para um segmento (usando !fname como variável E-goi)
-export function generateSegmentEmailTemplates(segment: Segment): NurturingEmail[] {
+// Gera 4 templates de email para um segmento com configuração
+export function generateSegmentEmailTemplates(
+  segment: Segment,
+  config?: Partial<EmailGenerationConfig>
+): NurturingEmail[] {
   const painPoints = SEGMENT_PAIN_POINTS[segment];
+  const fullConfig: EmailGenerationConfig = {
+    segment,
+    ...config,
+  };
   
   return EMAIL_TEMPLATES.map((template, index) => {
     const painPoint = painPoints[index % painPoints.length];
-    const subject = template.subject(segment);
-    const bodyContent = template.getContent(segment, painPoint);
+    const subject = template.subject(segment, fullConfig);
+    const bodyContent = template.getContent(segment, painPoint, fullConfig);
     const htmlContent = generateEmailHTML(subject, bodyContent);
 
     return {
@@ -327,12 +310,13 @@ export function generateSegmentEmailTemplates(segment: Segment): NurturingEmail[
   });
 }
 
-// Mantém compatibilidade - agora gera templates por segmento ao invés de por lead
+// Mantém compatibilidade - agora gera templates por segmento
 export function generateAllEmailsForSegment(
   _contacts: EmailContact[],
-  segment: Segment
+  segment: Segment,
+  config?: Partial<EmailGenerationConfig>
 ): NurturingEmail[] {
-  return generateSegmentEmailTemplates(segment);
+  return generateSegmentEmailTemplates(segment, config);
 }
 
 // Exporta todos os segmentos disponíveis
@@ -343,3 +327,45 @@ export const ALL_SEGMENTS: Segment[] = [
   'Tech/Indústria/Inovação',
   'Outros',
 ];
+
+// ============ FUNÇÕES PARA UI DE SELEÇÃO ============
+
+// Retorna os tipos de resultado de case disponíveis para um segmento
+export function getCaseResultTypesForSegment(segment: Segment): {
+  type: CaseResultType;
+  label: string;
+  casesCount: number;
+}[] {
+  const availableTypes = getAvailableResultTypes(segment);
+  return availableTypes.map(type => ({
+    type,
+    label: RESULT_TYPE_LABELS[type],
+    casesCount: getCasesBySegment(segment).filter(c => c.tipoResultado.includes(type)).length,
+  }));
+}
+
+// Retorna os materiais disponíveis para um segmento
+export function getMaterialsForSegment(segment: Segment): RichMaterial[] {
+  return getMaterialsBySegment(segment);
+}
+
+// Retorna o case que será usado para um segmento e tipo
+export function getPreviewCase(
+  segment: Segment, 
+  resultType?: CaseResultType
+): SuccessCase | undefined {
+  return getBestCaseForSegment(segment, resultType);
+}
+
+// Retorna o material que será usado para um segmento
+export function getPreviewMaterial(
+  segment: Segment,
+  companyContext?: string
+): RichMaterial {
+  return selectBestMaterialForSegment(segment, companyContext);
+}
+
+// Re-exporta tipos e funções úteis
+export type { CaseResultType, SuccessCase } from '@/data/successCases';
+export type { RichMaterial } from '@/data/richMaterials';
+export { RESULT_TYPE_LABELS } from '@/data/successCases';
