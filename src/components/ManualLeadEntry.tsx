@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { UserPlus, Plus, X } from 'lucide-react';
+import { UserPlus, Plus, X, Trash2 } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
@@ -24,45 +24,81 @@ const SEGMENTS: Segment[] = [
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+interface LeadRow {
+  id: number;
+  nome: string;
+  email: string;
+  segmento: Segment | 'auto';
+}
+
+let rowIdCounter = 0;
+
+const createEmptyRow = (): LeadRow => ({
+  id: ++rowIdCounter,
+  nome: '',
+  email: '',
+  segmento: 'auto',
+});
+
 export function ManualLeadEntry({ onAddContact }: ManualLeadEntryProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [nome, setNome] = useState('');
-  const [email, setEmail] = useState('');
-  const [segmento, setSegmento] = useState<Segment | 'auto'>('auto');
+  const [rows, setRows] = useState<LeadRow[]>(() => [createEmptyRow()]);
 
-  const handleAdd = useCallback(() => {
-    if (!nome.trim()) {
-      toast.error('Informe o nome do lead.');
-      return;
+  const handleUpdateRow = useCallback((id: number, field: keyof LeadRow, value: string) => {
+    setRows(prev => prev.map(r => r.id === id ? { ...r, [field]: value } : r));
+  }, []);
+
+  const handleAddRow = useCallback(() => {
+    setRows(prev => [...prev, createEmptyRow()]);
+  }, []);
+
+  const handleRemoveRow = useCallback((id: number) => {
+    setRows(prev => prev.length > 1 ? prev.filter(r => r.id !== id) : prev);
+  }, []);
+
+  const handleAddAll = useCallback(() => {
+    let added = 0;
+    const errors: string[] = [];
+
+    rows.forEach((row, index) => {
+      if (!row.nome.trim() && !row.email.trim()) return; // skip empty rows
+      
+      if (!row.nome.trim()) {
+        errors.push(`Linha ${index + 1}: nome vazio`);
+        return;
+      }
+      if (!row.email.trim() || !EMAIL_REGEX.test(row.email.trim())) {
+        errors.push(`Linha ${index + 1}: e-mail inválido`);
+        return;
+      }
+
+      const finalSegment: Segment = row.segmento === 'auto'
+        ? categorizeByDomainEnhanced(row.email.trim())
+        : row.segmento;
+
+      onAddContact({
+        nome: row.nome.trim(),
+        email: row.email.trim(),
+        segmento: finalSegment,
+        site: `https://${row.email.trim().split('@')[1]}`,
+      });
+      added++;
+    });
+
+    if (errors.length > 0) {
+      toast.error(`${errors.length} erro(s): ${errors[0]}`);
     }
-    if (!email.trim() || !EMAIL_REGEX.test(email.trim())) {
-      toast.error('Informe um e-mail válido.');
-      return;
+    if (added > 0) {
+      toast.success(`${added} lead(s) adicionado(s).`);
+      setRows([createEmptyRow()]);
     }
-
-    const finalSegment: Segment = segmento === 'auto' 
-      ? categorizeByDomainEnhanced(email.trim())
-      : segmento;
-
-    const contact: EmailContact = {
-      nome: nome.trim(),
-      email: email.trim(),
-      segmento: finalSegment,
-      site: `https://${email.trim().split('@')[1]}`,
-    };
-
-    onAddContact(contact);
-    setNome('');
-    setEmail('');
-    setSegmento('auto');
-    toast.success(`Lead "${contact.nome}" adicionado ao segmento ${finalSegment}.`);
-  }, [nome, email, segmento, onAddContact]);
+  }, [rows, onAddContact]);
 
   if (!isOpen) {
     return (
       <Button variant="outline" onClick={() => setIsOpen(true)} className="gap-2">
         <UserPlus className="w-4 h-4" />
-        Adicionar lead manualmente
+        Adicionar leads manualmente
       </Button>
     );
   }
@@ -72,53 +108,71 @@ export function ManualLeadEntry({ onAddContact }: ManualLeadEntryProps) {
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
           <UserPlus className="w-5 h-5 text-primary" />
-          Adicionar Lead
+          Adicionar Leads
         </h3>
-        <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)}>
+        <Button variant="ghost" size="icon" onClick={() => { setIsOpen(false); setRows([createEmptyRow()]); }}>
           <X className="w-4 h-4" />
         </Button>
       </div>
 
-      <div className="grid sm:grid-cols-3 gap-4">
-        <div className="space-y-2">
-          <Label htmlFor="lead-nome">Nome</Label>
-          <Input
-            id="lead-nome"
-            placeholder="Nome do lead"
-            value={nome}
-            onChange={(e) => setNome(e.target.value)}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="lead-email">E-mail</Label>
-          <Input
-            id="lead-email"
-            type="email"
-            placeholder="email@empresa.com"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-          />
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="lead-segmento">Segmento</Label>
-          <Select value={segmento} onValueChange={(v) => setSegmento(v as Segment | 'auto')}>
-            <SelectTrigger id="lead-segmento">
-              <SelectValue placeholder="Segmento" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="auto">Automático (detectar)</SelectItem>
-              {SEGMENTS.map(seg => (
-                <SelectItem key={seg} value={seg}>{seg}</SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
+      {/* Header labels */}
+      <div className="grid grid-cols-[1fr_1fr_1fr_40px] gap-3 items-end">
+        <Label className="text-xs text-muted-foreground">Nome</Label>
+        <Label className="text-xs text-muted-foreground">E-mail</Label>
+        <Label className="text-xs text-muted-foreground">Segmento</Label>
+        <div />
       </div>
 
-      <div className="flex justify-end">
-        <Button onClick={handleAdd} className="gap-2">
+      {/* Rows */}
+      <div className="space-y-2">
+        {rows.map((row) => (
+          <div key={row.id} className="grid grid-cols-[1fr_1fr_1fr_40px] gap-3 items-center">
+            <Input
+              placeholder="Nome do lead"
+              value={row.nome}
+              onChange={(e) => handleUpdateRow(row.id, 'nome', e.target.value)}
+            />
+            <Input
+              type="email"
+              placeholder="email@empresa.com"
+              value={row.email}
+              onChange={(e) => handleUpdateRow(row.id, 'email', e.target.value)}
+            />
+            <Select
+              value={row.segmento}
+              onValueChange={(v) => handleUpdateRow(row.id, 'segmento', v)}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="auto">Automático</SelectItem>
+                {SEGMENTS.map(seg => (
+                  <SelectItem key={seg} value={seg}>{seg}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9 text-muted-foreground hover:text-destructive"
+              onClick={() => handleRemoveRow(row.id)}
+              disabled={rows.length === 1}
+            >
+              <Trash2 className="w-4 h-4" />
+            </Button>
+          </div>
+        ))}
+      </div>
+
+      <div className="flex items-center justify-between">
+        <Button variant="outline" size="sm" onClick={handleAddRow} className="gap-2">
           <Plus className="w-4 h-4" />
-          Adicionar
+          Nova linha
+        </Button>
+        <Button onClick={handleAddAll} className="gap-2">
+          <UserPlus className="w-4 h-4" />
+          Adicionar {rows.length > 1 ? `${rows.length} leads` : 'lead'}
         </Button>
       </div>
     </div>
