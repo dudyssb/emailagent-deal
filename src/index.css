@@ -140,6 +140,18 @@
     @apply bg-muted text-muted-foreground border-border;
   }
 
+  .segment-badge-atacado {
+    background-color: hsl(25 80% 50% / 0.1);
+    color: hsl(25 80% 50%);
+    border-color: hsl(25 80% 50% / 0.2);
+  }
+
+  .segment-badge-educacao {
+    background-color: hsl(340 65% 50% / 0.1);
+    color: hsl(340 65% 50%);
+    border-color: hsl(340 65% 50% / 0.2);
+  }
+
   .glass-card {
     @apply bg-card/80 backdrop-blur-sm border border-border/50 shadow-lg;
   }

@@ -28,7 +28,9 @@ const SEGMENT_SHORT_NAMES: Record<Segment, string> = {
   'Mercado Financeiro': 'finance',
   'Agro/relacionados': 'agro',
   'Varejo': 'varejo',
+  'Atacado': 'atacado',
   'Tech/Indústria/Inovação': 'inovação',
+  'Educação': 'educação',
   'Outros': 'negócios',
 };
 
@@ -51,11 +53,23 @@ const SEGMENT_PAIN_POINTS: Record<Segment, string[]> = {
     'experiência do consumidor',
     'competitividade com e-commerce',
   ],
+  'Atacado': [
+    'gestão de grandes volumes e logística',
+    'integração com fornecedores e distribuidores',
+    'controle de estoque e armazenagem',
+    'competitividade de preços e margens',
+  ],
   'Tech/Indústria/Inovação': [
     'escalabilidade de soluções',
     'atração e retenção de talentos',
     'time-to-market de produtos',
     'integração de sistemas',
+  ],
+  'Educação': [
+    'transformação digital no ensino',
+    'gestão de plataformas de aprendizado',
+    'engajamento de alunos e retenção',
+    'escalabilidade de conteúdo educacional',
   ],
   'Outros': [
     'transformação digital',
@@ -324,7 +338,9 @@ export const ALL_SEGMENTS: Segment[] = [
   'Mercado Financeiro',
   'Agro/relacionados',
   'Varejo',
+  'Atacado',
   'Tech/Indústria/Inovação',
+  'Educação',
   'Outros',
 ];
 

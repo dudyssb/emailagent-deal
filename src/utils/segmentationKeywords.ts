@@ -94,12 +94,35 @@ export const TECH_INDUSTRIA_KEYWORDS: string[] = [
 export const OUTROS_KEYWORDS: string[] = [
   'consultoria', 'serviços especializados', 'servicos especializados',
   'soluções personalizadas', 'solucoes personalizadas', 'assessoria',
-  'educação', 'educacao', 'cursos', 'treinamentos',
   'ong', 'instituto', 'fundação', 'fundacao',
   'eventos', 'produção de eventos', 'producao de eventos',
   'marketing', 'publicidade', 'comunicação', 'comunicacao',
   'design', 'estúdio criativo', 'estudio criativo',
   'saúde', 'saude', 'turismo', 'hotelaria',
+];
+
+// 📦 ATACADO - Palavras-chave
+export const ATACADO_KEYWORDS: string[] = [
+  'atacado', 'atacadista', 'distribuidor', 'distribuidora', 'distribuição',
+  'wholesale', 'cash and carry', 'cash & carry',
+  'atacarejo', 'centro de distribuição', 'cd',
+  'logística', 'armazém', 'armazenagem', 'depósito',
+  'fornecedor', 'abastecimento', 'revenda', 'revendedor',
+  'grande volume', 'compra em quantidade', 'frete', 'transporte',
+  'makro', 'assai', 'atacadao', 'maxxi',
+];
+
+// 🎓 EDUCAÇÃO - Palavras-chave
+export const EDUCACAO_KEYWORDS: string[] = [
+  'educação', 'educacao', 'ensino', 'escola', 'universidade',
+  'faculdade', 'curso', 'cursos', 'treinamento', 'treinamentos',
+  'edtech', 'ead', 'e-learning', 'aprendizado', 'aprendizagem',
+  'professor', 'aluno', 'estudante', 'acadêmico', 'academico',
+  'pedagógico', 'pedagogico', 'didático', 'didatico',
+  'graduação', 'graduacao', 'pós-graduação', 'pos-graduacao',
+  'mba', 'mestrado', 'doutorado', 'pesquisa',
+  'plataforma educacional', 'lms', 'gestão escolar',
+  'vestibular', 'enem', 'certificação', 'capacitação',
 ];
 
 // Empresas conhecidas por segmento (para match exato)
@@ -316,7 +339,9 @@ export const SEGMENT_KEYWORDS_MAP: Record<Segment, string[]> = {
   'Mercado Financeiro': FINANCEIRO_KEYWORDS,
   'Agro/relacionados': AGRO_KEYWORDS,
   'Varejo': VAREJO_KEYWORDS,
+  'Atacado': ATACADO_KEYWORDS,
   'Tech/Indústria/Inovação': TECH_INDUSTRIA_KEYWORDS,
+  'Educação': EDUCACAO_KEYWORDS,
   'Outros': OUTROS_KEYWORDS,
 };
 
@@ -339,7 +364,9 @@ export function categorizeByDomainEnhanced(email: string): Segment {
     'Mercado Financeiro': 0,
     'Agro/relacionados': 0,
     'Varejo': 0,
+    'Atacado': 0,
     'Tech/Indústria/Inovação': 0,
+    'Educação': 0,
     'Outros': 0,
   };
   
@@ -387,7 +414,9 @@ export function categorizeByNomeInternoEnhanced(nomeInterno: string): Segment {
     'Mercado Financeiro': 0,
     'Agro/relacionados': 0,
     'Varejo': 0,
+    'Atacado': 0,
     'Tech/Indústria/Inovação': 0,
+    'Educação': 0,
     'Outros': 0,
   };
   
@@ -427,7 +456,9 @@ export function categorizeWithContext(
     'Mercado Financeiro': 0,
     'Agro/relacionados': 0,
     'Varejo': 0,
+    'Atacado': 0,
     'Tech/Indústria/Inovação': 0,
+    'Educação': 0,
     'Outros': 0,
   };
   

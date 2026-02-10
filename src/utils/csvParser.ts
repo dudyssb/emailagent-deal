@@ -10,7 +10,9 @@ const VALID_SEGMENTS: Segment[] = [
   'Mercado Financeiro',
   'Agro/relacionados',
   'Varejo',
+  'Atacado',
   'Tech/Indústria/Inovação',
+  'Educação',
   'Outros',
 ];
 
@@ -286,7 +288,6 @@ const DOMAIN_SEGMENT_MAP: Record<string, Segment> = {
   'magazine': 'Varejo',
   'mercado': 'Varejo',
   'supermercado': 'Varejo',
-  'atacado': 'Varejo',
   'varejo': 'Varejo',
   'retail': 'Varejo',
   'comercio': 'Varejo',
@@ -301,6 +302,14 @@ const DOMAIN_SEGMENT_MAP: Record<string, Segment> = {
   'moveis': 'Varejo',
   'eletro': 'Varejo',
   'eletronico': 'Varejo',
+  
+  // Atacado keywords
+  'atacado': 'Atacado',
+  'atacadista': 'Atacado',
+  'distribuidor': 'Atacado',
+  'distribuidora': 'Atacado',
+  'wholesale': 'Atacado',
+  'atacarejo': 'Atacado',
   
   // Tech keywords
   'tech': 'Tech/Indústria/Inovação',
@@ -372,10 +381,30 @@ const NOME_INTERNO_SEGMENT_MAP: Record<string, Segment> = {
   'comércio': 'Varejo',
   'ecommerce': 'Varejo',
   'e-commerce': 'Varejo',
-  'atacado': 'Varejo',
   'supermercado': 'Varejo',
   'supermercados': 'Varejo',
   'magazine': 'Varejo',
+  
+  // Atacado
+  'atacado': 'Atacado',
+  'atacadista': 'Atacado',
+  'distribuidor': 'Atacado',
+  'distribuidora': 'Atacado',
+  'wholesale': 'Atacado',
+  'atacarejo': 'Atacado',
+  
+  // Educação
+  'educação': 'Educação',
+  'educacao': 'Educação',
+  'ensino': 'Educação',
+  'escola': 'Educação',
+  'universidade': 'Educação',
+  'faculdade': 'Educação',
+  'edtech': 'Educação',
+  'curso': 'Educação',
+  'cursos': 'Educação',
+  'treinamento': 'Educação',
+  'treinamentos': 'Educação',
   
   // Tech
   'tech': 'Tech/Indústria/Inovação',
@@ -417,7 +446,9 @@ export function parseCSV(csvContent: string): ProcessingResult {
     'Mercado Financeiro': 0,
     'Agro/relacionados': 0,
     'Varejo': 0,
+    'Atacado': 0,
     'Tech/Indústria/Inovação': 0,
+    'Educação': 0,
     'Outros': 0,
   };
 
