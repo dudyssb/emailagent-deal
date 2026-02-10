@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Sidebar, TabType } from '@/components/Sidebar';
 import { FileUploader } from '@/components/FileUploader';
+import { ManualLeadEntry } from '@/components/ManualLeadEntry';
 import { SegmentStats } from '@/components/SegmentStats';
 import { ErrorList } from '@/components/ErrorList';
 import { ContactsTable } from '@/components/ContactsTable';
@@ -26,7 +27,9 @@ export default function Index() {
     'Mercado Financeiro': 0,
     'Agro/relacionados': 0,
     'Varejo': 0,
+    'Atacado': 0,
     'Tech/Indústria/Inovação': 0,
+    'Educação': 0,
     'Outros': 0,
   });
 
@@ -35,7 +38,9 @@ export default function Index() {
       'Mercado Financeiro': 0,
       'Agro/relacionados': 0,
       'Varejo': 0,
+      'Atacado': 0,
       'Tech/Indústria/Inovação': 0,
+      'Educação': 0,
       'Outros': 0,
     };
     contactList.forEach(c => {
@@ -60,6 +65,14 @@ export default function Index() {
   const [metrics, setMetrics] = useState<CampaignMetrics[]>([]);
   const [metricsErrors, setMetricsErrors] = useState<ValidationError[]>([]);
   const [isProcessingMetrics, setIsProcessingMetrics] = useState(false);
+
+  const handleAddContact = useCallback((contact: EmailContact) => {
+    setContacts(prev => {
+      const updated = [...prev, contact];
+      updateSegmentCounts(updated);
+      return updated;
+    });
+  }, [updateSegmentCounts]);
 
   const handleFileLoad = useCallback((content: string, file?: File) => {
     setIsProcessing(true);
@@ -121,10 +134,11 @@ export default function Index() {
             <div>
               <h2 className="text-2xl font-bold text-foreground mb-2">Importar Base de E-mails</h2>
               <p className="text-muted-foreground">
-                Faça upload de um arquivo CSV com as colunas <code className="bg-muted px-1.5 py-0.5 rounded text-sm">nome</code> e{' '}
-                <code className="bg-muted px-1.5 py-0.5 rounded text-sm">email</code> para iniciar a análise.
+                Faça upload de um arquivo CSV ou adicione leads manualmente.
               </p>
             </div>
+
+            <ManualLeadEntry onAddContact={handleAddContact} />
 
             <FileUploader 
               onFileLoad={handleFileLoad} 

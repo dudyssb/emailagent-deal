@@ -222,7 +222,7 @@ export const SUCCESS_CASES: SuccessCase[] = [
   {
     id: 'escola-negocios',
     empresa: 'Escola de Negócios (EdTech)',
-    setor: ['Outros', 'Tech/Indústria/Inovação'],
+    setor: ['Educação', 'Tech/Indústria/Inovação'],
     isPublic: true,
     tipoResultado: ['custo', 'eficiencia', 'inovacao'],
     descricao: 'Escola de Negócios que prepara líderes para desafios corporativos',

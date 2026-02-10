@@ -36,7 +36,7 @@ export const RICH_MATERIALS: RichMaterial[] = [
     id: 'cultura-inovacao',
     titulo: 'Como Fomentar uma Cultura de Inovação',
     descricao: 'Guia prático para criar uma cultura de inovação nas organizações',
-    segmentosAlvo: ['Tech/Indústria/Inovação', 'Outros'],
+    segmentosAlvo: ['Tech/Indústria/Inovação', 'Educação', 'Outros'],
     temas: ['inovação', 'cultura', 'transformação', 'liderança'],
     topicos: [
       'O que é inovação e como ela se manifesta nas empresas',
@@ -95,7 +95,7 @@ export const RICH_MATERIALS: RichMaterial[] = [
     id: 'data-analytics-ia',
     titulo: 'O Impacto da IA na Eficiência dos Negócios',
     descricao: 'Data & Analytics + AI: o que você precisa saber para avançar na era digital',
-    segmentosAlvo: ['Mercado Financeiro', 'Agro/relacionados', 'Varejo', 'Tech/Indústria/Inovação', 'Outros'],
+    segmentosAlvo: ['Mercado Financeiro', 'Agro/relacionados', 'Varejo', 'Atacado', 'Tech/Indústria/Inovação', 'Educação', 'Outros'],
     temas: ['IA', 'dados', 'analytics', 'machine learning', 'transformação digital'],
     topicos: [
       'A Inteligência Artificial como parte relevante no negócio de companhias em segmentos diversos',

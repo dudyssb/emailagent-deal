@@ -2,7 +2,9 @@ export type Segment =
   | 'Mercado Financeiro' 
   | 'Agro/relacionados' 
   | 'Varejo' 
+  | 'Atacado'
   | 'Tech/Indústria/Inovação' 
+  | 'Educação'
   | 'Outros';
 
 export interface EmailContact {

@@ -12,7 +12,9 @@ const SEGMENTS: Segment[] = [
   'Mercado Financeiro',
   'Agro/relacionados',
   'Varejo',
+  'Atacado',
   'Tech/Indústria/Inovação',
+  'Educação',
   'Outros',
 ];
 

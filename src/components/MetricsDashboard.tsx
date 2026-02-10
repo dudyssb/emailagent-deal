@@ -21,7 +21,9 @@ const SEGMENT_COLORS: Record<Segment, string> = {
   'Mercado Financeiro': 'hsl(217, 91%, 45%)',
   'Agro/relacionados': 'hsl(142, 76%, 36%)',
   'Varejo': 'hsl(280, 65%, 55%)',
+  'Atacado': 'hsl(25, 80%, 50%)',
   'Tech/Indústria/Inovação': 'hsl(199, 89%, 48%)',
+  'Educação': 'hsl(340, 65%, 50%)',
   'Outros': 'hsl(220, 10%, 50%)',
 };
 
