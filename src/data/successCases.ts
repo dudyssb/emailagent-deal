@@ -218,14 +218,14 @@ export const SUCCESS_CASES: SuccessCase[] = [
     ],
   },
 
-  // CASE EDUCACIONAL - Escola de Negócios
+  // CONQUER - Educacional
   {
-    id: 'escola-negocios',
-    empresa: 'Escola de Negócios (EdTech)',
+    id: 'conquer',
+    empresa: 'Conquer',
     setor: ['Educação', 'Tech/Indústria/Inovação'],
     isPublic: true,
     tipoResultado: ['custo', 'eficiencia', 'inovacao'],
-    descricao: 'Escola de Negócios que prepara líderes para desafios corporativos',
+    descricao: 'Instituição que prepara líderes corporativos para os desafios do mercado',
     desafio: 'Redução de custos de Cloud e implementação das melhores práticas DevOps',
     solucao: 'Análise do ambiente AWS para otimização, segurança, conformidade e FinOps',
     resultados: [
@@ -236,8 +236,51 @@ export const SUCCESS_CASES: SuccessCase[] = [
     ],
     destaque: 'ambiente 67% mais seguro com otimização significativa de custos',
     metricas: [
-      { label: 'Retorno financeiro alunos', valor: 'R$611 MI' },
       { label: 'Segurança', valor: '67% mais seguro' },
+    ],
+  },
+
+  // CRUZEIRO DO SUL - Educacional
+  {
+    id: 'cruzeiro-do-sul',
+    empresa: 'Cruzeiro do Sul',
+    setor: ['Educação'],
+    isPublic: true,
+    tipoResultado: ['performance', 'eficiencia'],
+    descricao: 'Entre as três melhores faculdades privadas de São Paulo',
+    desafio: 'Garantir monitoramento contínuo e tornar aplicações mais flexíveis, robustas e prontas para responder às necessidades dinâmicas do mercado',
+    solucao: 'Implementação e suporte a clusters Kubernetes com ferramentas de automação (Zenduty) integrada com Datadog para escalonamento inteligente',
+    resultados: [
+      'Melhor qualidade do monitoramento e velocidade para escalar problemas',
+      'Resposta rápida e eficiente a crises com suporte especializado',
+      'Acionamento automático de ações corretivas',
+    ],
+    destaque: 'monitoramento inteligente com escalonamento automático via Datadog',
+    metricas: [
+      { label: 'Escalonamento', valor: 'Automatizado' },
+    ],
+  },
+
+  // WEBMOTORS - Automotivo/Tech
+  {
+    id: 'webmotors',
+    empresa: 'Webmotors',
+    setor: ['Tech/Indústria/Inovação', 'Outros'],
+    isPublic: true,
+    tipoResultado: ['performance', 'eficiencia'],
+    descricao: 'Líder no setor de compra e venda de automóveis com mais de 21 milhões de visitas',
+    desafio: 'Estruturar a área de NOC (Centro de Operações) e implementar ferramentas e processos que garantissem a estabilidade da plataforma',
+    solucao: 'Implantação de operação dedicada da O2B para gerenciamento do ambiente em nuvem (AWS)',
+    resultados: [
+      '100% das aplicações críticas supervisionadas',
+      'Monitoramento de alta qualidade com visibilidade total',
+      'Antecipação e gerenciamento ágil de incidentes',
+      'Redução no tempo de indisponibilidade',
+    ],
+    destaque: '100% das aplicações críticas supervisionadas com visibilidade total',
+    metricas: [
+      { label: 'Visitas mensais', valor: '+21 milhões' },
+      { label: 'Apps supervisionadas', valor: '100%' },
     ],
   },
 
