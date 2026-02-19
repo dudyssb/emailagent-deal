@@ -284,42 +284,43 @@ export const SUCCESS_CASES: SuccessCase[] = [
     ],
   },
 
-  // TRAVELEX - Câmbio (case já existente)
+  // TRAVELEX - Câmbio
   {
     id: 'travelex',
     empresa: 'Travelex',
-    setor: ['Mercado Financeiro', 'Agro/relacionados', 'Outros'],
+    setor: ['Mercado Financeiro'],
     isPublic: true,
     tipoResultado: ['time_to_market', 'eficiencia', 'inovacao'],
-    descricao: 'Líder global em câmbio e pagamentos internacionais',
-    desafio: 'Construir motor de cobrança e conversão de câmbio em tempo real do zero',
-    solucao: 'Desenvolvimento ágil com squads integradas e roadmaps claros',
+    descricao: 'Primeiro banco aprovado para operar exclusivamente em câmbio – 5 bilhões transacionados/ano, 120 lojas, 5 milhões de clientes',
+    desafio: 'Aumentar capacidade de atender demandas do mercado de forma oportuna e competitiva, compondo equipe com perfis aderentes aos desafios do negócio',
+    solucao: 'Implementação de todo o processo de transformação digital e ágil, incluindo roadmap tecnológico e esteira ágil Dual Tracking',
     resultados: [
-      'Motor de câmbio em tempo real entregue em 60 dias',
-      'Melhoria de 80% em turnover e performance dos times',
+      'Motor de câmbio em tempo real entregue em 60 dias, do zero',
+      'Melhoria de 80% no turnover e aumento da performance da equipe',
       'Transformação ágil e digital com roadmaps implementados',
     ],
     destaque: 'motor de câmbio em tempo real em apenas 60 dias',
     metricas: [
       { label: 'Tempo entrega', valor: '60 dias' },
       { label: 'Melhoria turnover', valor: '80%' },
+      { label: 'Transações/ano', valor: 'R$5 BI' },
     ],
   },
 
-  // DESTY - Varejo (case já existente)
+  // DESTY - Banco Digital (spin-off BANESE)
   {
     id: 'desty',
     empresa: 'Desty',
-    setor: ['Varejo', 'Tech/Indústria/Inovação'],
+    setor: ['Mercado Financeiro'],
     isPublic: true,
     tipoResultado: ['time_to_market', 'escala', 'inovacao'],
-    descricao: 'Plataforma de e-commerce e marketplace',
-    desafio: 'Acelerar aquisição de clientes e estruturar roadmap tecnológico',
-    solucao: 'Plano estratégico e roadmap tecnológico estruturado para todas as squads',
+    descricao: 'Primeiro banco digital do Nordeste – spin-off digital do BANESE',
+    desafio: 'Orquestrar a entrega do banco digital cujo planejamento estava comprometido por falta de visibilidade e planejamento ineficaz',
+    solucao: 'Squads nas fases de onboarding, emissão e core bancário Technisys, cultura orientada a produtos e stack Azure moderno',
     resultados: [
       '164% da meta anual de aquisição de clientes em 15 dias',
-      'Roadmap tecnológico estruturado para todas as squads',
-      'Esteira de desenvolvimento aderente à evolução do segmento',
+      'Plano estratégico e roadmap tecnológico estruturado para todas as squads',
+      'Esteira de desenvolvimento alinhada com a evolução do segmento financeiro',
     ],
     destaque: '164% da meta anual de aquisição em apenas 15 dias',
     metricas: [
@@ -328,15 +329,15 @@ export const SUCCESS_CASES: SuccessCase[] = [
     ],
   },
 
-  // DIGIO - Fintech (case já existente)
+  // DIGIO - Fintech
   {
     id: 'digio',
     empresa: 'Digio',
     setor: ['Mercado Financeiro', 'Tech/Indústria/Inovação'],
     isPublic: true,
     tipoResultado: ['custo', 'eficiencia', 'inovacao'],
-    descricao: 'Banco digital com foco em experiência do usuário',
-    desafio: 'Unificar identidade digital e reduzir custos de desenvolvimento',
+    descricao: 'Banco digital do Bradesco com 2,8 milhões de clientes',
+    desafio: 'Unificar identidade e cultura das interfaces digitais, tornando o ecossistema mais omnichannel, reduzir silos e custos duplicados',
     solucao: 'Implementação de Design System com ecossistema modular escalável',
     resultados: [
       '42% de redução de custos e tempo de desenvolvimento',
@@ -347,7 +348,7 @@ export const SUCCESS_CASES: SuccessCase[] = [
     destaque: 'redução de 42% em custos de desenvolvimento',
     metricas: [
       { label: 'Redução custos', valor: '42%' },
-      { label: 'Redução tempo dev', valor: '42%' },
+      { label: 'Clientes', valor: '2,8 MI' },
     ],
   },
 
@@ -372,7 +373,7 @@ export const SUCCESS_CASES: SuccessCase[] = [
     ],
   },
 
-  // MONTADORA ALEMÃ - Indústria automotiva
+  // MONTADORA ALEMÃ
   {
     id: 'montadora-alemanha',
     empresa: 'Montadora Internacional (Alemanha)',
@@ -384,7 +385,6 @@ export const SUCCESS_CASES: SuccessCase[] = [
     solucao: 'Clusters Kubernetes com Rancher, ElasticSearch, Kibana e HAProxy',
     resultados: [
       'Visibilidade e controle do ambiente',
-      'Alinhamento com novas tecnologias',
       'Rapidez na entrega de novas soluções',
       'Escalabilidade de aplicações sob demanda',
       'Suporte 24/7 com foco em melhoria contínua',
@@ -400,15 +400,300 @@ export const SUCCESS_CASES: SuccessCase[] = [
     setor: ['Tech/Indústria/Inovação', 'Agro/relacionados'],
     isPublic: true,
     tipoResultado: ['performance', 'custo', 'escala'],
-    descricao: 'Líder no segmento logístico - portos e terminais',
-    desafio: 'Garantir sustentação e alta disponibilidade do SIOP (Sistema Integrado de Operações)',
+    descricao: 'Soluções logísticas integrando portos, ferrovias e terminais – SIOP',
+    desafio: 'Garantir suporte e alta disponibilidade do SIOP em contêineres e ambiente on-premise',
     solucao: 'Adoção de Kubernetes para aplicações complexas com múltiplos containers',
     resultados: [
-      'Estrutura mais robusta e eficiente',
-      'Redução de custos operacionais',
-      'Maior agilidade na implementação de novas funcionalidades',
+      'Melhora no desempenho do SIOP',
+      'Velocidade para escalar aplicações conteinerizadas',
+      'Resposta rápida a crises com suporte e time to market mais eficiente',
+      'Otimização de recursos e melhoria contínua',
     ],
     destaque: 'alta disponibilidade do sistema crítico de operações logísticas',
+    metricas: [],
+  },
+
+  // TRAY - E-commerce / TikTok
+  {
+    id: 'tray',
+    empresa: 'Tray',
+    setor: ['Varejo', 'Tech/Indústria/Inovação'],
+    isPublic: true,
+    tipoResultado: ['time_to_market', 'inovacao'],
+    descricao: 'Pioneira na América Latina a integrar com TikTok',
+    desafio: 'Prazo curto para integração com TikTok, com instabilidade e mudanças constantes nos serviços durante a implementação',
+    solucao: 'Avaliação de ambiente, análise de infraestrutura, Radar de 15 Fatores, roadmap de evolução com MVP, V2 e V3',
+    resultados: [
+      'Entrega do MVP Beta para clientes selecionados dentro do prazo',
+      'MVP em produção para todos os clientes Tray',
+      'Reconhecimento como pioneira na integração com TikTok na América Latina',
+    ],
+    destaque: 'primeira integração com TikTok na América Latina, entregue no prazo',
+    metricas: [
+      { label: 'Status', valor: 'Pioneira LATAM' },
+    ],
+  },
+
+  // CNA - Educação
+  {
+    id: 'cna',
+    empresa: 'CNA Inglês Definitivo',
+    setor: ['Educação'],
+    isPublic: true,
+    tipoResultado: ['eficiencia', 'inovacao', 'escala'],
+    descricao: 'Rede de ensino de idiomas com modernização de dados e analytics',
+    desafio: 'Modernizar infraestrutura de dados e analytics para arquitetura mais ágil e escalável, com integração de IA',
+    solucao: 'Data Lake robusto na AWS com tecnologias serverless, pipeline de transformação de dados e suporte à modernização de BI',
+    resultados: [
+      '100% dos relatórios exigidos pelo negócio entregues via Data Lake',
+      'Pipeline CI/CD implementado para fácil gerenciamento',
+      'Dashboards e relatórios disponibilizados mais rapidamente',
+      'Maior flexibilidade e agilidade para futuras demandas',
+    ],
+    destaque: '100% dos relatórios entregues via Data Lake com CI/CD automatizado',
+    metricas: [
+      { label: 'Relatórios Data Lake', valor: '100%' },
+    ],
+  },
+
+  // B3 - Bolsa de Valores
+  {
+    id: 'b3',
+    empresa: 'B3',
+    setor: ['Mercado Financeiro'],
+    isPublic: true,
+    tipoResultado: ['time_to_market', 'inovacao'],
+    descricao: 'Bolsa de Valores brasileira – mais de 5 milhões de investidores em renda variável',
+    desafio: 'Construir e lançar produto inovador (crowdfunding Educa+) no mercado em 5 meses, engajando stakeholders',
+    solucao: 'Co-criação do crowdfunding integrado com dados de investidores e sistemas legados do Tesouro Direto, ciclo Lean Startup',
+    resultados: [
+      'Lançamento de produto inovador no Brasil em 5 meses',
+      'Fomento da cultura de produto upstream de forma escalável',
+      'Cultura de colaboração e inovação contínua via Lean Startup',
+    ],
+    destaque: 'produto inovador lançado no mercado em apenas 5 meses',
+    metricas: [
+      { label: 'Time to market', valor: '5 meses' },
+      { label: 'Investidores RV', valor: '+5 MI' },
+    ],
+  },
+
+  // FISERV - Tecnologia Financeira
+  {
+    id: 'fiserv',
+    empresa: 'Fiserv',
+    setor: ['Mercado Financeiro', 'Tech/Indústria/Inovação'],
+    isPublic: true,
+    tipoResultado: ['eficiencia', 'performance', 'inovacao'],
+    descricao: 'Líder global em tecnologia financeira e pagamentos – 7 bilhões em transações, 200 milhões de portadores',
+    desafio: 'Segurança negligenciada pelas equipes DevOps, equipes de segurança em silos separados com ferramentas isoladas',
+    solucao: 'Criação de métodos, processos, ferramentas, métricas e cultura DevSecOps elevando o nível de maturidade',
+    resultados: [
+      'Cadeia de valor DevSecOps implementada',
+      'Implementação da cultura e cargas de trabalho DevSecOps',
+      'Redução de custos e aumento da produtividade',
+      'Padronização de processos nas operações',
+    ],
+    destaque: 'cultura DevSecOps implementada com redução de custos',
+    metricas: [
+      { label: 'Transações', valor: '7 BI' },
+      { label: 'Portadores', valor: '200 MI' },
+    ],
+  },
+
+  // KM DE VANTAGENS (IPIRANGA) - Programa de Fidelidade / Varejo
+  // (nota: case distinto do Ipiranga acima que é sobre PDVs)
+
+  // VELOE - FinOps
+  {
+    id: 'veloe',
+    empresa: 'Veloe',
+    setor: ['Mercado Financeiro', 'Outros'],
+    isPublic: true,
+    tipoResultado: ['custo', 'eficiencia'],
+    descricao: 'Empresa de pagamentos de pedágios e estacionamentos do grupo Alelo',
+    desafio: 'Otimizar custos, ter bom controle e aumentar eficiência no ambiente de nuvem',
+    solucao: 'Solução FinOps para eliminar gastos excessivos, otimizar recursos e investir melhor em áreas estratégicas',
+    resultados: [
+      'Redução significativa de custos e realocação assertiva de recursos na nuvem',
+      'Dashboard operacional alinhado à estratégia de negócios',
+      'Melhora na governança e visibilidade do ambiente de nuvem',
+      'Melhora nas revisões de produtos',
+    ],
+    destaque: 'redução significativa de custos com FinOps e governança de nuvem',
+    metricas: [
+      { label: 'FinOps', valor: 'Implementado' },
+    ],
+  },
+
+  // GETNET - Pagamentos
+  {
+    id: 'getnet',
+    empresa: 'Getnet',
+    setor: ['Mercado Financeiro', 'Varejo'],
+    isPublic: true,
+    tipoResultado: ['performance', 'eficiencia', 'custo'],
+    descricao: 'Gigante em pagamentos eletrônicos – 15% de participação de mercado',
+    desafio: 'Jornadas não fluidas, taxa de rejeição acima de 64%, dados inconsistentes, dificuldade na marcação de vendas e mídia',
+    solucao: 'Growth Hacking, DesignOps e Front-End com análise heurística, prototipagem, analytics e integração de mais de 40 fontes de dados',
+    resultados: [
+      '75% de evolução na experiência em dispositivos móveis',
+      'Aumento considerável na retenção e conversão de clientes',
+      'Aumento de 1,2 milhão de visitas mensais na jornada',
+      'Redução de CAC omnichannel em 32%',
+    ],
+    destaque: '75% de evolução mobile e 32% de redução no CAC omnichannel',
+    metricas: [
+      { label: 'Evolução mobile', valor: '75%' },
+      { label: 'Redução CAC', valor: '32%' },
+      { label: 'Visitas/mês', valor: '+1,2 MI' },
+    ],
+  },
+
+  // VERTEM FAMILHÃO - Plataforma de Recompensas
+  {
+    id: 'vertem',
+    empresa: 'Vertem Familhão',
+    setor: ['Varejo', 'Tech/Indústria/Inovação'],
+    isPublic: true,
+    tipoResultado: ['escala', 'performance', 'inovacao'],
+    descricao: 'Maior plataforma de recompensas do Brasil',
+    desafio: 'Construir plataforma escalável com arquitetura sólida para grande volume de usuários simultâneos',
+    solucao: 'Estrutura robusta com microsserviços e BFFs, micro front-end white label',
+    resultados: [
+      'Framework micro front-end white label com alta escalabilidade e replicabilidade',
+      'Arquitetura de microsserviços integrando diversos produtos e parceiros',
+      'Priorização do WhatsApp garantindo acessibilidade',
+      'Aumento significativo no número de novas assinaturas',
+    ],
+    destaque: 'framework micro front-end white label escalável e replicável',
+    metricas: [],
+  },
+
+  // ASSAÍ - Atacado/Varejo
+  {
+    id: 'assai',
+    empresa: 'Assaí Atacadista',
+    setor: ['Atacado', 'Varejo'],
+    isPublic: true,
+    tipoResultado: ['inovacao', 'escala', 'time_to_market'],
+    descricao: 'Aplicativo de compras com presença em Apple Store, Google Play e web',
+    desafio: 'Definir estratégia de produto, arquitetura escalável com microsserviços, e garantir disponibilidade multiplataforma',
+    solucao: 'Lean Inception para ideação e protótipos, arquitetura de microsserviços e contêineres',
+    resultados: [
+      'Produto digital bem estruturado com estratégia sólida da ideação à execução',
+      'Arquitetura escalável e flexível pronta para crescimento',
+      'Disponibilidade em múltiplas plataformas (Apple Store, Google Play, web)',
+    ],
+    destaque: 'aplicativo multiplataforma com arquitetura escalável',
+    metricas: [],
+  },
+
+  // CANAL DA PEÇA - Marketplace Autopeças
+  {
+    id: 'canal-da-peca',
+    empresa: 'Canal da Peça',
+    setor: ['Varejo', 'Tech/Indústria/Inovação'],
+    isPublic: true,
+    tipoResultado: ['inovacao', 'escala', 'eficiencia'],
+    descricao: 'Maior marketplace de autopeças do Brasil',
+    desafio: 'Mudança de mindset e cultura, redefinição de modelo de negócio e plataforma, governança ágil',
+    solucao: 'Treinamentos ágeis, redefinição de plataforma digital, modelo de governança ágil e DevOps',
+    resultados: [
+      'Transformação digital com redefinição do modelo de negócio',
+      'Transformação ágil completa com Governança Ágil',
+      'Aumento da maturidade das squads',
+      'Crescimento de mais de 100% na receita recorrente',
+    ],
+    destaque: 'mais de 100% de crescimento na receita recorrente',
+    metricas: [
+      { label: 'Crescimento receita', valor: '+100%' },
+    ],
+  },
+
+  // VIA VAREJO - Varejo
+  {
+    id: 'via-varejo',
+    empresa: 'Via Varejo',
+    setor: ['Varejo'],
+    isPublic: true,
+    tipoResultado: ['escala', 'performance'],
+    descricao: 'Líder no varejo – Casas Bahia, Pontofrio e Bartira',
+    desafio: 'Gerenciar altos volumes de dados, complexidade de integração, manter resiliência e disponibilidade',
+    solucao: 'Data Streaming com Apache Kafka, Zookeeper, APIs de sincronização, caching e balanceamento de carga',
+    resultados: [
+      'Mais de 120 milhões de mensagens processadas na Black Friday',
+      'Escalabilidade e resiliência garantidas',
+      'Sincronização de catálogo, estoque, preço e disponibilidade',
+      'Crescimento de 60% nos acessos e 20% na receita',
+    ],
+    destaque: '120 milhões de mensagens na Black Friday com 60% mais acessos',
+    metricas: [
+      { label: 'Msgs Black Friday', valor: '120 MI' },
+      { label: 'Crescimento acessos', valor: '60%' },
+      { label: 'Crescimento receita', valor: '20%' },
+    ],
+  },
+
+  // INFRA COMMERCE - Full Service (case atualizado com mais detalhes)
+  {
+    id: 'infracommerce-monitoring',
+    empresa: 'Infra Commerce',
+    setor: ['Varejo', 'Tech/Indústria/Inovação'],
+    isPublic: true,
+    tipoResultado: ['performance', 'eficiencia'],
+    descricao: 'Líder em Full Service na América Latina – referência em Customer Experience as a Service',
+    desafio: 'Identificar e agir rapidamente em eventos que possam interferir na operação de e-commerce dos clientes, especialmente antes da Black Friday',
+    solucao: 'Dashboard em tempo real para monitorar e-commerces com equipe O2B dedicada 24/7',
+    resultados: [
+      'Alertas de sistema para respostas rápidas com suporte 24/7',
+      'Mais controle e agilidade para as operações',
+      '70% das solicitações aos distribuidores monitoradas',
+      'Assertividade e segurança para os negócios dos clientes',
+    ],
+    destaque: '70% das solicitações monitoradas com suporte 24/7 para Black Friday',
+    metricas: [
+      { label: 'Solicitações monitoradas', valor: '70%' },
+    ],
+  },
+
+  // ODONTOPREV - Saúde
+  {
+    id: 'odontoprev',
+    empresa: 'Odontoprev',
+    setor: ['Outros'],
+    isPublic: true,
+    tipoResultado: ['eficiencia', 'inovacao'],
+    descricao: 'Maior empresa de benefícios odontológicos do Brasil – maior pagadora de dividendos na B3',
+    desafio: 'Unificar DW, atender áreas de Operações, Vendas e Risco, integrar sistemas heterogêneos em plataforma única',
+    solucao: 'Consultoria Sysvision + implementação de DW, Microstrategy Analytics, IBM DataStage e Oracle PL/SQL',
+    resultados: [
+      'Data Warehouse unificado para todas as áreas',
+      'Integração de sistemas heterogêneos em plataforma única',
+      'Analytics avançado com Microstrategy',
+    ],
+    destaque: 'DW unificado integrando Operações, Vendas e Risco',
+    metricas: [],
+  },
+
+  // LTM - Programas de Fidelidade
+  {
+    id: 'ltm',
+    empresa: 'LTM',
+    setor: ['Varejo', 'Tech/Indústria/Inovação'],
+    isPublic: true,
+    tipoResultado: ['inovacao', 'eficiencia', 'escala'],
+    descricao: 'Líder de mercado com 15+ anos em programas de fidelidade',
+    desafio: 'Adaptação cultural ágil, integrar dados limpos no datalake para IA e análises preditivas, garantir escalabilidade dos modelos',
+    solucao: 'PowerBI com machine learning, centralização com Datalake, ambiente multicloud',
+    resultados: [
+      'Squads ágeis treinadas com Agile Scrum',
+      'Ambiente multicloud construído',
+      'Integração completa com Datalake',
+      'Relatórios PowerBI e análise What-If',
+      'Previsão de produção com machine learning',
+    ],
+    destaque: 'IA preditiva com machine learning e ambiente multicloud',
     metricas: [],
   },
 ];
