@@ -60,6 +60,7 @@ export default function Index() {
   }, [updateSegmentCounts]);
   const [selectedSegment, setSelectedSegment] = useState<Segment | null>(null);
   const [selectedCaseResultType, setSelectedCaseResultType] = useState<CaseResultType | undefined>(undefined);
+  const [selectedCaseId, setSelectedCaseId] = useState<string | undefined>(undefined);
   const [generatedEmails, setGeneratedEmails] = useState<NurturingEmail[]>([]);
   const [isProcessing, setIsProcessing] = useState(false);
   const [metrics, setMetrics] = useState<CampaignMetrics[]>([]);
@@ -92,8 +93,8 @@ export default function Index() {
 
   const handleSegmentSelect = useCallback((segment: Segment) => {
     setSelectedSegment(segment === selectedSegment ? null : segment);
-    // Reset case type when changing segment
     setSelectedCaseResultType(undefined);
+    setSelectedCaseId(undefined);
   }, [selectedSegment]);
 
   const handleLogout = useCallback(() => {
@@ -106,12 +107,13 @@ export default function Index() {
     
     const config: Partial<EmailGenerationConfig> = {
       selectedCaseResultType,
+      selectedCaseId,
     };
     
     const emails = generateAllEmailsForSegment(contacts, selectedSegment, config);
     setGeneratedEmails(emails);
     setActiveTab('emails');
-  }, [contacts, selectedSegment, selectedCaseResultType]);
+  }, [contacts, selectedSegment, selectedCaseResultType, selectedCaseId]);
 
   const handleMetricsFileLoad = useCallback((content: string) => {
     setIsProcessingMetrics(true);
@@ -163,6 +165,8 @@ export default function Index() {
                       segment={selectedSegment}
                       selectedResultType={selectedCaseResultType}
                       onSelectResultType={setSelectedCaseResultType}
+                      selectedCaseId={selectedCaseId}
+                      onSelectCaseId={setSelectedCaseId}
                     />
                     
                     <div className="flex flex-col justify-center items-center p-6 rounded-xl border border-primary/20 bg-primary/5">

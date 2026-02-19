@@ -5,6 +5,7 @@ import {
   CaseResultType, 
   RESULT_TYPE_LABELS,
   getCasesBySegment,
+  getCasesBySegmentAndType,
   getBestCaseForSegment,
   getAvailableResultTypes 
 } from '@/data/successCases';
@@ -88,17 +89,39 @@ function getShortSegmentName(segmento: Segment): string {
 export interface EmailGenerationConfig {
   segment: Segment;
   selectedCaseResultType?: CaseResultType;
-  companyContext?: string; // Para seleção automática de material
+  selectedCaseId?: string;
+  companyContext?: string;
 }
 
-// Email 1: Parceria estratégica (usa nome curto do segmento)
+// Helper: resolve the selected case
+function resolveCase(segmento: Segment, config: EmailGenerationConfig): SuccessCase | undefined {
+  if (config.selectedCaseId) {
+    const allCases = getCasesBySegment(segmento);
+    return allCases.find(c => c.id === config.selectedCaseId) || getBestCaseForSegment(segmento, config.selectedCaseResultType);
+  }
+  return getBestCaseForSegment(segmento, config.selectedCaseResultType);
+}
+
+// Email 1: Parceria estratégica - adapta o texto com base no case escolhido para Email 2
 const emailTemplate1 = {
   subject: (segmento: Segment) => {
     const shortName = getShortSegmentName(segmento);
     return `${EGOI_NAME_VAR}, uma parceria estratégica para ${shortName}`;
   },
-  getContent: (segmento: Segment, painPoint: string, _config: EmailGenerationConfig) => {
+  getContent: (segmento: Segment, painPoint: string, config: EmailGenerationConfig) => {
     const shortName = getShortSegmentName(segmento);
+    const chosenCase = resolveCase(segmento, config);
+
+    // Se há um case escolhido, referenciar o desafio dele no Email 1
+    if (chosenCase) {
+      return `
+        <p>Olá ${EGOI_NAME_VAR},</p>
+        <p>Notei que sua empresa atua no segmento de <strong>${shortName}</strong> e sei que ${painPoint} é um desafio constante nesse setor.</p>
+        <p>Na Deal, temos ajudado empresas como a <strong>${chosenCase.empresa}</strong> a superar desafios semelhantes – com resultados como <strong>${chosenCase.destaque}</strong>.</p>
+        <p>Gostaria de agendar uma conversa rápida de 15 minutos para entender como podemos fazer o mesmo pela sua empresa?</p>
+      `;
+    }
+
     return `
       <p>Olá ${EGOI_NAME_VAR},</p>
       <p>Notei que sua empresa atua no segmento de <strong>${shortName}</strong> e sei que ${painPoint} é um desafio constante nesse setor.</p>
@@ -111,12 +134,12 @@ const emailTemplate1 = {
 // Email 2: Case de sucesso (usa case selecionado ou automático)
 const emailTemplate2 = {
   subject: (segmento: Segment, config: EmailGenerationConfig) => {
-    const successCase = getBestCaseForSegment(segmento, config.selectedCaseResultType);
+    const successCase = resolveCase(segmento, config);
     if (!successCase) return `Resultados reais em transformação digital`;
     return `Case ${successCase.empresa}: resultados reais em transformação digital`;
   },
   getContent: (segmento: Segment, _painPoint: string, config: EmailGenerationConfig) => {
-    const successCase = getBestCaseForSegment(segmento, config.selectedCaseResultType);
+    const successCase = resolveCase(segmento, config);
     
     if (!successCase) {
       return `
@@ -127,7 +150,7 @@ const emailTemplate2 = {
     }
 
     const resultadosHTML = successCase.resultados
-      .slice(0, 4) // Máximo 4 resultados
+      .slice(0, 4)
       .map(r => `<li>${r}</li>`)
       .join('\n          ');
     
@@ -358,6 +381,11 @@ export function getCaseResultTypesForSegment(segment: Segment): {
     label: RESULT_TYPE_LABELS[type],
     casesCount: getCasesBySegment(segment).filter(c => c.tipoResultado.includes(type)).length,
   }));
+}
+
+// Retorna cases filtrados por segmento e tipo de resultado
+export function getCasesForSegmentAndType(segment: Segment, resultType: CaseResultType): SuccessCase[] {
+  return getCasesBySegmentAndType(segment, resultType);
 }
 
 // Retorna os materiais disponíveis para um segmento
