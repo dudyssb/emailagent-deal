@@ -7,12 +7,10 @@ export interface RichMaterial {
   segmentosAlvo: Segment[];
   temas: string[];
   topicos: string[];
-  keywords: string[]; // Palavras-chave para match automático
+  keywords: string[];
 }
 
-// Materiais ricos extraídos dos ebooks/papers
 export const RICH_MATERIALS: RichMaterial[] = [
-  // E-book Meios de Pagamentos (Financeiro)
   {
     id: 'meios-pagamentos',
     titulo: 'A Evolução dos Meios de Pagamentos Internacionais',
@@ -25,18 +23,13 @@ export const RICH_MATERIALS: RichMaterial[] = [
       'Case "PIX Internacional"',
       'Plataforma NEXUS para pagamentos globais',
     ],
-    keywords: [
-      'banco', 'fintech', 'pagamento', 'câmbio', 'transferência', 'remessa',
-      'pix', 'swift', 'internacional', 'moeda', 'corretora', 'exchange',
-    ],
+    keywords: ['banco', 'fintech', 'pagamento', 'câmbio', 'transferência', 'remessa', 'pix', 'swift', 'internacional', 'moeda', 'corretora', 'exchange'],
   },
-
-  // E-book Cultura de Inovação (Geral/Tech)
   {
     id: 'cultura-inovacao',
     titulo: 'Como Fomentar uma Cultura de Inovação',
     descricao: 'Guia prático para criar uma cultura de inovação nas organizações',
-    segmentosAlvo: ['Tech/Indústria/Inovação', 'Educação', 'Outros'],
+    segmentosAlvo: ['Tech/Inovação', 'Educação', 'Outros'],
     temas: ['inovação', 'cultura', 'transformação', 'liderança'],
     topicos: [
       'O que é inovação e como ela se manifesta nas empresas',
@@ -44,18 +37,13 @@ export const RICH_MATERIALS: RichMaterial[] = [
       'Digitalização de processos como ferramenta de transformação',
       'Como criar um ciclo virtuoso de inovação',
     ],
-    keywords: [
-      'startup', 'inovação', 'transformação digital', 'cultura', 'liderança',
-      'tecnologia', 'digital', 'processos', 'modernização',
-    ],
+    keywords: ['startup', 'inovação', 'transformação digital', 'cultura', 'liderança', 'tecnologia', 'digital', 'processos', 'modernização'],
   },
-
-  // E-book Multicloud Cloud-Native (Tech/Indústria)
   {
     id: 'multicloud-cloudnative',
     titulo: 'Economia Inteligente: Como Multicloud e Cloud-Native Reduzem Custos',
     descricao: 'Estratégias para otimização de custos com multicloud e cloud-native',
-    segmentosAlvo: ['Tech/Indústria/Inovação', 'Mercado Financeiro'],
+    segmentosAlvo: ['Tech/Inovação', 'Indústria', 'Mercado Financeiro'],
     temas: ['cloud', 'multicloud', 'kubernetes', 'FinOps', 'custos'],
     topicos: [
       'Conceitos de Cloud-Native e Multicloud',
@@ -64,18 +52,13 @@ export const RICH_MATERIALS: RichMaterial[] = [
       'FinOps e seus benefícios',
       'Cases de sucesso: Celcoin, Thema/Pólis, VLI',
     ],
-    keywords: [
-      'cloud', 'aws', 'azure', 'gcp', 'kubernetes', 'k8s', 'container',
-      'infraestrutura', 'devops', 'datacenter', 'custos', 'finops',
-    ],
+    keywords: ['cloud', 'aws', 'azure', 'gcp', 'kubernetes', 'k8s', 'container', 'infraestrutura', 'devops', 'datacenter', 'custos', 'finops'],
   },
-
-  // E-book Microsserviços (Tech/Indústria)
   {
     id: 'microsservicos',
     titulo: 'Microsserviços: O Caminho da Eficiência e Escalabilidade',
     descricao: 'Análise completa sobre arquitetura de microsserviços',
-    segmentosAlvo: ['Tech/Indústria/Inovação'],
+    segmentosAlvo: ['Tech/Inovação', 'Indústria'],
     temas: ['microsserviços', 'arquitetura', 'escalabilidade', 'DevOps'],
     topicos: [
       'Componentização via serviços',
@@ -84,18 +67,13 @@ export const RICH_MATERIALS: RichMaterial[] = [
       'Automação de infraestrutura',
       'Design evolutivo',
     ],
-    keywords: [
-      'software', 'desenvolvimento', 'arquitetura', 'api', 'backend',
-      'sistema', 'aplicação', 'microsserviços', 'deploy', 'escala',
-    ],
+    keywords: ['software', 'desenvolvimento', 'arquitetura', 'api', 'backend', 'sistema', 'aplicação', 'microsserviços', 'deploy', 'escala'],
   },
-
-  // E-book Data & Analytics + AI (Todos os segmentos)
   {
     id: 'data-analytics-ia',
     titulo: 'O Impacto da IA na Eficiência dos Negócios',
     descricao: 'Data & Analytics + AI: o que você precisa saber para avançar na era digital',
-    segmentosAlvo: ['Mercado Financeiro', 'Agro/relacionados', 'Varejo', 'Atacado', 'Tech/Indústria/Inovação', 'Educação', 'Outros'],
+    segmentosAlvo: ['Mercado Financeiro', 'Agro/relacionados', 'Varejo', 'Atacado', 'Tech/Inovação', 'Indústria', 'Educação', 'Saúde', 'Outros'],
     temas: ['IA', 'dados', 'analytics', 'machine learning', 'transformação digital'],
     topicos: [
       'A Inteligência Artificial como parte relevante no negócio de companhias em segmentos diversos',
@@ -105,13 +83,8 @@ export const RICH_MATERIALS: RichMaterial[] = [
       'Como a IA está mudando estratégias de Big Data',
       'IA na operação de dados: da estratégia à aplicação',
     ],
-    keywords: [
-      'dados', 'data', 'analytics', 'bi', 'inteligência artificial', 'ia', 'ai',
-      'machine learning', 'big data', 'análise', 'insights', 'predição',
-    ],
+    keywords: ['dados', 'data', 'analytics', 'bi', 'inteligência artificial', 'ia', 'ai', 'machine learning', 'big data', 'análise', 'insights', 'predição'],
   },
-
-  // Paper Black Friday (Varejo)
   {
     id: 'black-friday',
     titulo: 'Black Friday 2024: Como se Destacar e Maximizar Resultados no Digital',
@@ -127,60 +100,36 @@ export const RICH_MATERIALS: RichMaterial[] = [
       'Phygital e formas de pagamento',
       'IA como aliada nas vendas',
     ],
-    keywords: [
-      'varejo', 'e-commerce', 'loja', 'venda', 'consumidor', 'marketing',
-      'campanha', 'promoção', 'black friday', 'desconto', 'checkout',
-    ],
+    keywords: ['varejo', 'e-commerce', 'loja', 'venda', 'consumidor', 'marketing', 'campanha', 'promoção', 'black friday', 'desconto', 'checkout'],
   },
 ];
 
-// Busca materiais por segmento
 export function getMaterialsBySegment(segment: Segment): RichMaterial[] {
   return RICH_MATERIALS.filter(m => m.segmentosAlvo.includes(segment));
 }
 
-// Função para calcular score de match entre material e contexto
 function calculateMatchScore(material: RichMaterial, context: string): number {
   const contextLower = context.toLowerCase();
   let score = 0;
-  
-  // Pontos por keywords encontradas
   material.keywords.forEach(keyword => {
-    if (contextLower.includes(keyword.toLowerCase())) {
-      score += 2;
-    }
+    if (contextLower.includes(keyword.toLowerCase())) score += 2;
   });
-  
-  // Pontos por temas encontrados
   material.temas.forEach(tema => {
-    if (contextLower.includes(tema.toLowerCase())) {
-      score += 3;
-    }
+    if (contextLower.includes(tema.toLowerCase())) score += 3;
   });
-  
   return score;
 }
 
-// Seleciona automaticamente o melhor material para um segmento e contexto
-export function selectBestMaterialForSegment(
-  segment: Segment,
-  companyContext?: string // Informações sobre a empresa (domínio, nome, etc.)
-): RichMaterial {
+export function selectBestMaterialForSegment(segment: Segment, companyContext?: string): RichMaterial {
   const availableMaterials = getMaterialsBySegment(segment);
-  
   if (availableMaterials.length === 0) {
-    // Fallback para material genérico de IA (serve para todos)
     return RICH_MATERIALS.find(m => m.id === 'data-analytics-ia')!;
   }
-  
   if (availableMaterials.length === 1 || !companyContext) {
     return availableMaterials[0];
   }
-  
-  // Calcula score para cada material
   let bestMaterial = availableMaterials[0];
   let bestScore = 0;
-  
   availableMaterials.forEach(material => {
     const score = calculateMatchScore(material, companyContext);
     if (score > bestScore) {
@@ -188,22 +137,13 @@ export function selectBestMaterialForSegment(
       bestMaterial = material;
     }
   });
-  
   return bestMaterial;
 }
 
-// Retorna materiais ordenados por relevância para um contexto
-export function getMaterialsRankedByRelevance(
-  segment: Segment,
-  companyContext: string
-): RichMaterial[] {
+export function getMaterialsRankedByRelevance(segment: Segment, companyContext: string): RichMaterial[] {
   const materials = getMaterialsBySegment(segment);
-  
   return materials
-    .map(m => ({
-      material: m,
-      score: calculateMatchScore(m, companyContext),
-    }))
+    .map(m => ({ material: m, score: calculateMatchScore(m, companyContext) }))
     .sort((a, b) => b.score - a.score)
     .map(item => item.material);
 }

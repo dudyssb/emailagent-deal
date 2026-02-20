@@ -4,23 +4,13 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { EmailContact, Segment } from '@/types/email';
+import { EmailContact, Segment, ALL_SEGMENTS } from '@/types/email';
 import { categorizeByDomainEnhanced } from '@/utils/segmentationKeywords';
 import { toast } from 'sonner';
 
 interface ManualLeadEntryProps {
   onAddContact: (contact: EmailContact) => void;
 }
-
-const SEGMENTS: Segment[] = [
-  'Mercado Financeiro',
-  'Agro/relacionados',
-  'Varejo',
-  'Atacado',
-  'Tech/Indústria/Inovação',
-  'Educação',
-  'Outros',
-];
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -61,7 +51,7 @@ export function ManualLeadEntry({ onAddContact }: ManualLeadEntryProps) {
     const errors: string[] = [];
 
     rows.forEach((row, index) => {
-      if (!row.nome.trim() && !row.email.trim()) return; // skip empty rows
+      if (!row.nome.trim() && !row.email.trim()) return;
       
       if (!row.nome.trim()) {
         errors.push(`Linha ${index + 1}: nome vazio`);
@@ -115,7 +105,6 @@ export function ManualLeadEntry({ onAddContact }: ManualLeadEntryProps) {
         </Button>
       </div>
 
-      {/* Header labels */}
       <div className="grid grid-cols-[1fr_1fr_1fr_40px] gap-3 items-end">
         <Label className="text-xs text-muted-foreground">Nome</Label>
         <Label className="text-xs text-muted-foreground">E-mail</Label>
@@ -123,7 +112,6 @@ export function ManualLeadEntry({ onAddContact }: ManualLeadEntryProps) {
         <div />
       </div>
 
-      {/* Rows */}
       <div className="space-y-2">
         {rows.map((row) => (
           <div key={row.id} className="grid grid-cols-[1fr_1fr_1fr_40px] gap-3 items-center">
@@ -147,7 +135,7 @@ export function ManualLeadEntry({ onAddContact }: ManualLeadEntryProps) {
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="auto">Automático</SelectItem>
-                {SEGMENTS.map(seg => (
+                {ALL_SEGMENTS.map(seg => (
                   <SelectItem key={seg} value={seg}>{seg}</SelectItem>
                 ))}
               </SelectContent>

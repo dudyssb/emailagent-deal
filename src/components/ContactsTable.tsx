@@ -1,4 +1,4 @@
-import { EmailContact, Segment } from '@/types/email';
+import { EmailContact, Segment, ALL_SEGMENTS } from '@/types/email';
 import { SegmentBadge } from './SegmentBadge';
 import { Mail, ExternalLink, Search, Edit2, Check, X } from 'lucide-react';
 import { useState, useMemo, useCallback } from 'react';
@@ -12,16 +12,6 @@ interface ContactsTableProps {
   onSelectSegment?: (segment: Segment | null) => void;
   onUpdateSegment?: (email: string, newSegment: Segment) => void;
 }
-
-const SEGMENTS: Segment[] = [
-  'Mercado Financeiro',
-  'Agro/relacionados',
-  'Varejo',
-  'Atacado',
-  'Tech/Indústria/Inovação',
-  'Educação',
-  'Outros',
-];
 
 export function ContactsTable({ contacts, selectedSegment, onSelectSegment, onUpdateSegment }: ContactsTableProps) {
   const [search, setSearch] = useState('');
@@ -88,7 +78,7 @@ export function ContactsTable({ contacts, selectedSegment, onSelectSegment, onUp
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">Todos os segmentos</SelectItem>
-              {SEGMENTS.map(seg => (
+              {ALL_SEGMENTS.map(seg => (
                 <SelectItem key={seg} value={seg}>
                   {seg}
                 </SelectItem>
@@ -149,7 +139,7 @@ export function ContactsTable({ contacts, selectedSegment, onSelectSegment, onUp
                               <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
-                              {SEGMENTS.map(seg => (
+                              {ALL_SEGMENTS.map(seg => (
                                 <SelectItem key={seg} value={seg}>
                                   {seg}
                                 </SelectItem>

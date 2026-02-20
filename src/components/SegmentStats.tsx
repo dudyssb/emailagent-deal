@@ -1,4 +1,4 @@
-import { Segment } from '@/types/email';
+import { Segment, ALL_SEGMENTS } from '@/types/email';
 import { SegmentBadge } from './SegmentBadge';
 import { Users, TrendingUp } from 'lucide-react';
 
@@ -7,16 +7,6 @@ interface SegmentStatsProps {
   onSegmentSelect?: (segment: Segment) => void;
   selectedSegment?: Segment | null;
 }
-
-const SEGMENTS: Segment[] = [
-  'Mercado Financeiro',
-  'Agro/relacionados',
-  'Varejo',
-  'Atacado',
-  'Tech/Indústria/Inovação',
-  'Educação',
-  'Outros',
-];
 
 export function SegmentStats({ segmentCounts, onSegmentSelect, selectedSegment }: SegmentStatsProps) {
   const total = Object.values(segmentCounts).reduce((a, b) => a + b, 0);
@@ -35,8 +25,8 @@ export function SegmentStats({ segmentCounts, onSegmentSelect, selectedSegment }
       </div>
 
       <div className="grid gap-3">
-        {SEGMENTS.map((segment) => {
-          const count = segmentCounts[segment];
+        {ALL_SEGMENTS.map((segment) => {
+          const count = segmentCounts[segment] || 0;
           const percentage = total > 0 ? (count / total) * 100 : 0;
           const isSelected = selectedSegment === segment;
 

@@ -54,7 +54,7 @@ export const SUCCESS_CASES: SuccessCase[] = [
   {
     id: 'celcoin',
     empresa: 'Celcoin',
-    setor: ['Mercado Financeiro', 'Tech/Indústria/Inovação'],
+    setor: ['Mercado Financeiro', 'Tech/Inovação'],
     isPublic: true,
     tipoResultado: ['custo', 'escala', 'inovacao'],
     descricao: 'Pioneira em infraestrutura de tecnologia financeira e bancária, movimentando R$17 BI mensalmente',
@@ -151,7 +151,7 @@ export const SUCCESS_CASES: SuccessCase[] = [
   {
     id: 'infracommerce',
     empresa: 'Infracommerce',
-    setor: ['Varejo', 'Tech/Indústria/Inovação'],
+    setor: ['Varejo', 'Tech/Inovação'],
     isPublic: true,
     tipoResultado: ['custo', 'escala', 'performance'],
     descricao: 'Maior plataforma de full commerce do Brasil com 18MM de pedidos anuais',
@@ -222,7 +222,7 @@ export const SUCCESS_CASES: SuccessCase[] = [
   {
     id: 'conquer',
     empresa: 'Conquer',
-    setor: ['Educação', 'Tech/Indústria/Inovação'],
+    setor: ['Educação', 'Tech/Inovação'],
     isPublic: true,
     tipoResultado: ['custo', 'eficiencia', 'inovacao'],
     descricao: 'Instituição que prepara líderes corporativos para os desafios do mercado',
@@ -265,7 +265,7 @@ export const SUCCESS_CASES: SuccessCase[] = [
   {
     id: 'webmotors',
     empresa: 'Webmotors',
-    setor: ['Tech/Indústria/Inovação', 'Outros'],
+    setor: ['Tech/Inovação', 'Outros'],
     isPublic: true,
     tipoResultado: ['performance', 'eficiencia'],
     descricao: 'Líder no setor de compra e venda de automóveis com mais de 21 milhões de visitas',
@@ -333,7 +333,7 @@ export const SUCCESS_CASES: SuccessCase[] = [
   {
     id: 'digio',
     empresa: 'Digio',
-    setor: ['Mercado Financeiro', 'Tech/Indústria/Inovação'],
+    setor: ['Mercado Financeiro', 'Tech/Inovação'],
     isPublic: true,
     tipoResultado: ['custo', 'eficiencia', 'inovacao'],
     descricao: 'Banco digital do Bradesco com 2,8 milhões de clientes',
@@ -356,7 +356,7 @@ export const SUCCESS_CASES: SuccessCase[] = [
   {
     id: 'thema-polis',
     empresa: 'Grupo Thema/Pólis',
-    setor: ['Tech/Indústria/Inovação', 'Outros'],
+    setor: ['Tech/Inovação', 'Outros'],
     isPublic: true,
     tipoResultado: ['escala', 'performance', 'inovacao'],
     descricao: 'Desenvolvimento de software para Gestão Pública',
@@ -377,7 +377,7 @@ export const SUCCESS_CASES: SuccessCase[] = [
   {
     id: 'montadora-alemanha',
     empresa: 'Montadora Internacional (Alemanha)',
-    setor: ['Tech/Indústria/Inovação'],
+    setor: ['Indústria'],
     isPublic: false,
     tipoResultado: ['escala', 'time_to_market', 'performance'],
     descricao: 'Líder na fabricação e comercialização de veículos automotores',
@@ -397,7 +397,7 @@ export const SUCCESS_CASES: SuccessCase[] = [
   {
     id: 'vli',
     empresa: 'VLI',
-    setor: ['Tech/Indústria/Inovação', 'Agro/relacionados'],
+    setor: ['Indústria', 'Agro/relacionados'],
     isPublic: true,
     tipoResultado: ['performance', 'custo', 'escala'],
     descricao: 'Soluções logísticas integrando portos, ferrovias e terminais – SIOP',
@@ -417,7 +417,7 @@ export const SUCCESS_CASES: SuccessCase[] = [
   {
     id: 'tray',
     empresa: 'Tray',
-    setor: ['Varejo', 'Tech/Indústria/Inovação'],
+    setor: ['Varejo', 'Tech/Inovação'],
     isPublic: true,
     tipoResultado: ['time_to_market', 'inovacao'],
     descricao: 'Pioneira na América Latina a integrar com TikTok',
@@ -482,7 +482,7 @@ export const SUCCESS_CASES: SuccessCase[] = [
   {
     id: 'fiserv',
     empresa: 'Fiserv',
-    setor: ['Mercado Financeiro', 'Tech/Indústria/Inovação'],
+    setor: ['Mercado Financeiro', 'Tech/Inovação'],
     isPublic: true,
     tipoResultado: ['eficiencia', 'performance', 'inovacao'],
     descricao: 'Líder global em tecnologia financeira e pagamentos – 7 bilhões em transações, 200 milhões de portadores',
@@ -554,7 +554,7 @@ export const SUCCESS_CASES: SuccessCase[] = [
   {
     id: 'vertem',
     empresa: 'Vertem Familhão',
-    setor: ['Varejo', 'Tech/Indústria/Inovação'],
+    setor: ['Varejo', 'Tech/Inovação'],
     isPublic: true,
     tipoResultado: ['escala', 'performance', 'inovacao'],
     descricao: 'Maior plataforma de recompensas do Brasil',
@@ -593,7 +593,7 @@ export const SUCCESS_CASES: SuccessCase[] = [
   {
     id: 'canal-da-peca',
     empresa: 'Canal da Peça',
-    setor: ['Varejo', 'Tech/Indústria/Inovação'],
+    setor: ['Varejo', 'Tech/Inovação'],
     isPublic: true,
     tipoResultado: ['inovacao', 'escala', 'eficiencia'],
     descricao: 'Maior marketplace de autopeças do Brasil',
@@ -639,7 +639,7 @@ export const SUCCESS_CASES: SuccessCase[] = [
   {
     id: 'infracommerce-monitoring',
     empresa: 'Infra Commerce',
-    setor: ['Varejo', 'Tech/Indústria/Inovação'],
+    setor: ['Varejo', 'Tech/Inovação'],
     isPublic: true,
     tipoResultado: ['performance', 'eficiencia'],
     descricao: 'Líder em Full Service na América Latina – referência em Customer Experience as a Service',
@@ -680,7 +680,7 @@ export const SUCCESS_CASES: SuccessCase[] = [
   {
     id: 'ltm',
     empresa: 'LTM',
-    setor: ['Varejo', 'Tech/Indústria/Inovação'],
+    setor: ['Varejo', 'Tech/Inovação'],
     isPublic: true,
     tipoResultado: ['inovacao', 'eficiencia', 'escala'],
     descricao: 'Líder de mercado com 15+ anos em programas de fidelidade',

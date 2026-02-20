@@ -1,4 +1,4 @@
-import { EmailContact, Segment, NurturingEmail } from '@/types/email';
+import { EmailContact, Segment, NurturingEmail, ALL_SEGMENTS } from '@/types/email';
 import { Download, FileText, Archive, CheckCircle } from 'lucide-react';
 import { Button } from './ui/button';
 import { exportToCSV } from '@/utils/csvParser';
@@ -10,16 +10,6 @@ interface ExportPanelProps {
   emails: NurturingEmail[];
   segmentCounts: Record<Segment, number>;
 }
-
-const SEGMENTS: Segment[] = [
-  'Mercado Financeiro',
-  'Agro/relacionados',
-  'Varejo',
-  'Atacado',
-  'Tech/Indústria/Inovação',
-  'Educação',
-  'Outros',
-];
 
 export function ExportPanel({ contacts, emails, segmentCounts }: ExportPanelProps) {
   const [exportedFiles, setExportedFiles] = useState<string[]>([]);
@@ -76,7 +66,6 @@ export function ExportPanel({ contacts, emails, segmentCounts }: ExportPanelProp
         </p>
       </div>
 
-      {/* Export All */}
       <div className="rounded-xl border border-border bg-card p-6">
         <div className="flex items-start justify-between">
           <div className="flex items-start gap-4">
@@ -97,12 +86,11 @@ export function ExportPanel({ contacts, emails, segmentCounts }: ExportPanelProp
         </div>
       </div>
 
-      {/* Segment Exports */}
       <div className="space-y-3">
         <h4 className="font-medium text-foreground">Por Segmento</h4>
         
-        {SEGMENTS.map((segment) => {
-          const count = segmentCounts[segment];
+        {ALL_SEGMENTS.map((segment) => {
+          const count = segmentCounts[segment] || 0;
           const segmentEmails = emails.filter(e => e.targetContact.segmento === segment);
 
           if (count === 0) return null;
@@ -135,7 +123,6 @@ export function ExportPanel({ contacts, emails, segmentCounts }: ExportPanelProp
         })}
       </div>
 
-      {/* Export Log */}
       {exportedFiles.length > 0 && (
         <div className="rounded-xl border border-success/30 bg-success/5 p-4">
           <div className="flex items-center gap-2 mb-3">

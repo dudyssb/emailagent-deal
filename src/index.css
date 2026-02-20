@@ -146,10 +146,22 @@
     border-color: hsl(25 80% 50% / 0.2);
   }
 
+  .segment-badge-industria {
+    background-color: hsl(45 80% 45% / 0.1);
+    color: hsl(45 80% 45%);
+    border-color: hsl(45 80% 45% / 0.2);
+  }
+
   .segment-badge-educacao {
     background-color: hsl(340 65% 50% / 0.1);
     color: hsl(340 65% 50%);
     border-color: hsl(340 65% 50% / 0.2);
+  }
+
+  .segment-badge-saude {
+    background-color: hsl(160 60% 40% / 0.1);
+    color: hsl(160 60% 40%);
+    border-color: hsl(160 60% 40% / 0.2);
   }
 
   .glass-card {
