@@ -7,90 +7,78 @@ import { Segment } from '@/types/email';
 
 // 🛍️ VAREJO - Palavras-chave
 export const VAREJO_KEYWORDS: string[] = [
-  // Diretas
   'loja', 'lojas', 'e-commerce', 'ecommerce', 'varejo', 'retail',
   'consumidor final', 'ponto de venda', 'pdv', 'mix de produtos',
   'estoque', 'vitrine', 'promoção', 'ofertas', 'catálogo',
   'carrinho', 'checkout', 'frete', 'entrega',
-  // Corporativas
   'experiência de compra', 'jornada do cliente', 'omnichannel',
   'marketplace', 'sell-out', 'trade marketing', 'giro de estoque',
-  // Adicionais do mapa existente
   'store', 'shop', 'shopping', 'magazine', 'mercado', 'supermercado',
   'atacado', 'comercio', 'moda', 'vestuario', 'calcados', 'cosmeticos',
   'perfumaria', 'joias', 'otica', 'moveis', 'eletro', 'eletronico',
-  // Combinações
   'loja online', 'compre agora', 'comprar online',
 ];
 
 // 💰 MERCADO FINANCEIRO - Palavras-chave
 export const FINANCEIRO_KEYWORDS: string[] = [
-  // Institucional/produtos
   'investimentos', 'ativos financeiros', 'renda fixa', 'renda variável',
   'fundos', 'fundos de investimento', 'carteira', 'portfólio',
   'gestão de recursos', 'wealth management', 'asset management',
   'corretora', 'banco', 'banco digital', 'crédito', 'empréstimo',
   'financiamento', 'câmbio',
-  // Técnicos
   'liquidez', 'rentabilidade', 'risco', 'perfil de risco',
   'derivativos', 'ações', 'bolsa', 'b3', 'compliance financeiro',
   'regulação', 'bacen', 'cvm',
-  // Adicionais do mapa existente
   'finance', 'invest', 'capital', 'seguro', 'fintech', 'pag', 'pay',
   'credit', 'credito', 'emprestimo', 'financeira', 'asset', 'gestora',
   'fundo', 'previdencia', 'consorcio', 'factoring',
-  // Combinações
   'plataforma de investimentos', 'conta digital', 'open banking',
   'open finance', 'pix', 'ted', 'doc', 'boleto',
 ];
 
 // 🌾 AGRO - Palavras-chave
 export const AGRO_KEYWORDS: string[] = [
-  // Produção e campo
   'agronegócio', 'agronegocio', 'produtor rural', 'fazenda', 'safra',
   'plantio', 'colheita', 'lavoura', 'pecuária', 'pecuaria',
   'gado', 'bovino', 'suíno', 'suino', 'aves', 'agricultura de precisão',
-  // Insumos e tecnologia
   'fertilizantes', 'defensivos agrícolas', 'defensivos agricolas',
   'sementes', 'nutrição animal', 'nutricao animal',
   'maquinário agrícola', 'maquinario agricola', 'implementos',
   'irrigação', 'irrigacao', 'silagem', 'armazenagem de grãos',
   'armazenagem de graos',
-  // Adicionais do mapa existente
   'agro', 'rural', 'agricola', 'soja', 'milho', 'cafe', 'coop',
   'granja', 'frango', 'avicola', 'fertil', 'graos', 'laticinio',
   'laticinios', 'frigorifico', 'alimentos', 'trator', 'maquinas',
-  // Combinações
   'soluções para o produtor rural', 'gestão rural', 'crédito rural',
 ];
 
-// 🏭💻 TECH / INDÚSTRIA - Palavras-chave
-export const TECH_INDUSTRIA_KEYWORDS: string[] = [
-  // Indústria
-  'manufatura', 'produção industrial', 'producao industrial',
-  'linha de produção', 'linha de producao', 'automação industrial',
-  'automacao industrial', 'engenharia', 'equipamentos industriais',
-  'manutenção industrial', 'manutencao industrial',
-  'eficiência operacional', 'eficiencia operacional',
-  'controle de qualidade', 'cadeia de suprimentos', 'supply chain',
-  // Tech
+// 💻 TECH / INOVAÇÃO - Palavras-chave
+export const TECH_INOVACAO_KEYWORDS: string[] = [
   'software', 'plataforma', 'saas', 'sistema', 'sistemas',
   'tecnologia proprietária', 'tecnologia proprietaria',
   'inteligência artificial', 'inteligencia artificial', 'dados', 'data',
   'nuvem', 'cloud', 'api', 'integração', 'integracao',
   'cibersegurança', 'ciberseguranca', 'transformação digital',
   'transformacao digital', 'inovação tecnológica', 'inovacao tecnologica',
-  // Adicionais do mapa existente
   'tech', 'tecnologia', 'digital', 'labs', 'dev', 'io',
-  'industria', 'manufacturing', 'inovacao', 'startup', 'app',
-  'cyber', 'ai', 'machine', 'automation', 'automacao', 'robotica',
-  'iot', 'solucoes', 'metalurgica', 'siderurgica', 'fabrica',
-  // Combinações
-  'software para gestão industrial', 'gestão industrial',
+  'inovacao', 'startup', 'app', 'cyber', 'ai', 'machine',
+  'solucoes',
+];
+
+// 🏭 INDÚSTRIA - Palavras-chave
+export const INDUSTRIA_KEYWORDS: string[] = [
+  'manufatura', 'produção industrial', 'producao industrial',
+  'linha de produção', 'linha de producao', 'automação industrial',
+  'automacao industrial', 'engenharia', 'equipamentos industriais',
+  'manutenção industrial', 'manutencao industrial',
+  'eficiência operacional', 'eficiencia operacional',
+  'controle de qualidade', 'cadeia de suprimentos', 'supply chain',
+  'industria', 'manufacturing', 'automation', 'automacao', 'robotica',
+  'iot', 'metalurgica', 'siderurgica', 'fabrica',
   'indústria 4.0', 'industria 4.0', 'smart factory',
 ];
 
-// 📦 OUTROS - Palavras-chave (genérico / difícil de classificar)
+// 📦 OUTROS - Palavras-chave
 export const OUTROS_KEYWORDS: string[] = [
   'consultoria', 'serviços especializados', 'servicos especializados',
   'soluções personalizadas', 'solucoes personalizadas', 'assessoria',
@@ -98,7 +86,7 @@ export const OUTROS_KEYWORDS: string[] = [
   'eventos', 'produção de eventos', 'producao de eventos',
   'marketing', 'publicidade', 'comunicação', 'comunicacao',
   'design', 'estúdio criativo', 'estudio criativo',
-  'saúde', 'saude', 'turismo', 'hotelaria',
+  'turismo', 'hotelaria',
 ];
 
 // 📦 ATACADO - Palavras-chave
@@ -125,7 +113,20 @@ export const EDUCACAO_KEYWORDS: string[] = [
   'vestibular', 'enem', 'certificação', 'capacitação',
 ];
 
-// Empresas conhecidas por segmento (para match exato)
+// 🏥 SAÚDE - Palavras-chave
+export const SAUDE_KEYWORDS: string[] = [
+  'saúde', 'saude', 'hospital', 'hospitalar', 'clínica', 'clinica',
+  'médico', 'medico', 'medicina', 'farmácia', 'farmacia', 'pharma',
+  'healthtech', 'health tech', 'odontologia', 'odonto', 'dental',
+  'laboratório', 'laboratorio', 'diagnóstico', 'diagnostico',
+  'plano de saúde', 'plano de saude', 'convênio', 'convenio',
+  'unimed', 'hapvida', 'dasa', 'fleury', 'hermes pardini',
+  'biomedicina', 'enfermagem', 'fisioterapia', 'nutrição clínica',
+  'equipamentos médicos', 'dispositivos médicos', 'telemedicina',
+  'prontuário eletrônico', 'gestão hospitalar', 'SUS',
+];
+
+// Empresas conhecidas por segmento
 export const KNOWN_COMPANIES: Record<string, Segment> = {
   // Fintechs & Financial
   'picpay': 'Mercado Financeiro',
@@ -236,7 +237,7 @@ export const KNOWN_COMPANIES: Record<string, Segment> = {
   'fertipar': 'Agro/relacionados',
   'ourofertil': 'Agro/relacionados',
   
-  // Varejo major retailers
+  // Varejo
   'americanas': 'Varejo',
   'casasbahia': 'Varejo',
   'pontofrio': 'Varejo',
@@ -288,60 +289,76 @@ export const KNOWN_COMPANIES: Record<string, Segment> = {
   'desty': 'Varejo',
   'infracommerce': 'Varejo',
   
-  // Tech companies Brazil
-  'totvs': 'Tech/Indústria/Inovação',
-  'locaweb': 'Tech/Indústria/Inovação',
-  'vtex': 'Tech/Indústria/Inovação',
-  'linx': 'Tech/Indústria/Inovação',
-  'ciandt': 'Tech/Indústria/Inovação',
-  'stefanini': 'Tech/Indústria/Inovação',
-  'positivo': 'Tech/Indústria/Inovação',
-  'movile': 'Tech/Indústria/Inovação',
-  'ifood': 'Tech/Indústria/Inovação',
-  'rappi': 'Tech/Indústria/Inovação',
-  '99': 'Tech/Indústria/Inovação',
-  'loggi': 'Tech/Indústria/Inovação',
-  'quinto': 'Tech/Indústria/Inovação',
-  'quintoandar': 'Tech/Indústria/Inovação',
-  'loft': 'Tech/Indústria/Inovação',
-  'ebanx': 'Tech/Indústria/Inovação',
-  'madeiramadeira': 'Tech/Indústria/Inovação',
-  'olist': 'Tech/Indústria/Inovação',
-  'nuvemshop': 'Tech/Indústria/Inovação',
-  'rdstation': 'Tech/Indústria/Inovação',
-  'resultados': 'Tech/Indústria/Inovação',
-  'hotmart': 'Tech/Indústria/Inovação',
-  'tractian': 'Tech/Indústria/Inovação',
-  'cloudwalk': 'Tech/Indústria/Inovação',
-  'sallve': 'Tech/Indústria/Inovação',
-  'gympass': 'Tech/Indústria/Inovação',
-  'wellhub': 'Tech/Indústria/Inovação',
-  'nuuvem': 'Tech/Indústria/Inovação',
-  'pipefy': 'Tech/Indústria/Inovação',
-  'involves': 'Tech/Indústria/Inovação',
-  'weg': 'Tech/Indústria/Inovação',
-  'embraer': 'Tech/Indústria/Inovação',
-  'gerdau': 'Tech/Indústria/Inovação',
-  'csn': 'Tech/Indústria/Inovação',
-  'usiminas': 'Tech/Indústria/Inovação',
-  'tupy': 'Tech/Indústria/Inovação',
-  'randon': 'Tech/Indústria/Inovação',
-  'iochpe': 'Tech/Indústria/Inovação',
-  'marcopolo': 'Tech/Indústria/Inovação',
-  'tramontina': 'Tech/Indústria/Inovação',
-  'schulz': 'Tech/Indústria/Inovação',
-  'romi': 'Tech/Indústria/Inovação',
-  'embraco': 'Tech/Indústria/Inovação',
+  // Tech companies
+  'totvs': 'Tech/Inovação',
+  'locaweb': 'Tech/Inovação',
+  'vtex': 'Tech/Inovação',
+  'linx': 'Tech/Inovação',
+  'ciandt': 'Tech/Inovação',
+  'stefanini': 'Tech/Inovação',
+  'positivo': 'Tech/Inovação',
+  'movile': 'Tech/Inovação',
+  'ifood': 'Tech/Inovação',
+  'rappi': 'Tech/Inovação',
+  '99': 'Tech/Inovação',
+  'loggi': 'Tech/Inovação',
+  'quinto': 'Tech/Inovação',
+  'quintoandar': 'Tech/Inovação',
+  'loft': 'Tech/Inovação',
+  'ebanx': 'Tech/Inovação',
+  'madeiramadeira': 'Tech/Inovação',
+  'olist': 'Tech/Inovação',
+  'nuvemshop': 'Tech/Inovação',
+  'rdstation': 'Tech/Inovação',
+  'resultados': 'Tech/Inovação',
+  'hotmart': 'Tech/Inovação',
+  'tractian': 'Tech/Inovação',
+  'cloudwalk': 'Tech/Inovação',
+  'sallve': 'Tech/Inovação',
+  'gympass': 'Tech/Inovação',
+  'wellhub': 'Tech/Inovação',
+  'nuuvem': 'Tech/Inovação',
+  'pipefy': 'Tech/Inovação',
+  'involves': 'Tech/Inovação',
+
+  // Indústria
+  'weg': 'Indústria',
+  'embraer': 'Indústria',
+  'gerdau': 'Indústria',
+  'csn': 'Indústria',
+  'usiminas': 'Indústria',
+  'tupy': 'Indústria',
+  'randon': 'Indústria',
+  'iochpe': 'Indústria',
+  'marcopolo': 'Indústria',
+  'tramontina': 'Indústria',
+  'schulz': 'Indústria',
+  'romi': 'Indústria',
+  'embraco': 'Indústria',
+
+  // Saúde
+  'unimed': 'Saúde',
+  'hapvida': 'Saúde',
+  'dasa': 'Saúde',
+  'fleury': 'Saúde',
+  'hermespardini': 'Saúde',
+  'einstein': 'Saúde',
+  'sirioslibanes': 'Saúde',
+  'amil': 'Saúde',
+  'notredame': 'Saúde',
+  'odontoprev': 'Saúde',
 };
 
-// Mapa de keywords para segmentos (para busca rápida)
+// Mapa de keywords para segmentos
 export const SEGMENT_KEYWORDS_MAP: Record<Segment, string[]> = {
   'Mercado Financeiro': FINANCEIRO_KEYWORDS,
   'Agro/relacionados': AGRO_KEYWORDS,
   'Varejo': VAREJO_KEYWORDS,
   'Atacado': ATACADO_KEYWORDS,
-  'Tech/Indústria/Inovação': TECH_INDUSTRIA_KEYWORDS,
+  'Tech/Inovação': TECH_INOVACAO_KEYWORDS,
+  'Indústria': INDUSTRIA_KEYWORDS,
   'Educação': EDUCACAO_KEYWORDS,
+  'Saúde': SAUDE_KEYWORDS,
   'Outros': OUTROS_KEYWORDS,
 };
 
@@ -352,7 +369,7 @@ export function categorizeByDomainEnhanced(email: string): Segment {
   const domain = email.split('@')[1]?.toLowerCase() || '';
   const domainName = domain.split('.')[0] || '';
   
-  // 1. Primeiro verifica empresas conhecidas (match exato ou contém)
+  // 1. Primeiro verifica empresas conhecidas
   for (const [company, segment] of Object.entries(KNOWN_COMPANIES)) {
     if (domainName.includes(company) || domain.includes(company)) {
       return segment;
@@ -365,14 +382,15 @@ export function categorizeByDomainEnhanced(email: string): Segment {
     'Agro/relacionados': 0,
     'Varejo': 0,
     'Atacado': 0,
-    'Tech/Indústria/Inovação': 0,
+    'Tech/Inovação': 0,
+    'Indústria': 0,
     'Educação': 0,
+    'Saúde': 0,
     'Outros': 0,
   };
   
   for (const [segment, keywords] of Object.entries(SEGMENT_KEYWORDS_MAP)) {
     for (const keyword of keywords) {
-      // Normaliza keyword removendo acentos e espaços
       const normalizedKeyword = keyword
         .toLowerCase()
         .normalize('NFD')
@@ -384,12 +402,11 @@ export function categorizeByDomainEnhanced(email: string): Segment {
         .replace(/[\u0300-\u036f]/g, '');
       
       if (normalizedDomain.includes(normalizedKeyword)) {
-        scores[segment as Segment] += keyword.includes(' ') ? 3 : 1; // Combinações valem mais
+        scores[segment as Segment] += keyword.includes(' ') ? 3 : 1;
       }
     }
   }
   
-  // 3. Retorna segmento com maior score (se > 0)
   const maxScore = Math.max(...Object.values(scores));
   if (maxScore > 0) {
     const bestSegment = Object.entries(scores).find(([_, score]) => score === maxScore);
@@ -415,8 +432,10 @@ export function categorizeByNomeInternoEnhanced(nomeInterno: string): Segment {
     'Agro/relacionados': 0,
     'Varejo': 0,
     'Atacado': 0,
-    'Tech/Indústria/Inovação': 0,
+    'Tech/Inovação': 0,
+    'Indústria': 0,
     'Educação': 0,
+    'Saúde': 0,
     'Outros': 0,
   };
   
@@ -445,7 +464,7 @@ export function categorizeByNomeInternoEnhanced(nomeInterno: string): Segment {
 }
 
 /**
- * Categoriza com base em múltiplos inputs (email, nome da empresa, contexto adicional)
+ * Categoriza com base em múltiplos inputs
  */
 export function categorizeWithContext(
   email: string,
@@ -457,27 +476,26 @@ export function categorizeWithContext(
     'Agro/relacionados': 0,
     'Varejo': 0,
     'Atacado': 0,
-    'Tech/Indústria/Inovação': 0,
+    'Tech/Inovação': 0,
+    'Indústria': 0,
     'Educação': 0,
+    'Saúde': 0,
     'Outros': 0,
   };
   
-  // Score do domínio
   const domainSegment = categorizeByDomainEnhanced(email);
   if (domainSegment !== 'Outros') {
     scores[domainSegment] += 5;
   }
   
-  // Score do nome da empresa
   if (companyName) {
     const normalized = companyName.toLowerCase();
     for (const [company, segment] of Object.entries(KNOWN_COMPANIES)) {
       if (normalized.includes(company)) {
-        scores[segment] += 10; // Match de empresa conhecida tem peso alto
+        scores[segment] += 10;
       }
     }
     
-    // Também verifica keywords
     for (const [segment, keywords] of Object.entries(SEGMENT_KEYWORDS_MAP)) {
       for (const keyword of keywords) {
         if (normalized.includes(keyword.toLowerCase())) {
@@ -487,7 +505,6 @@ export function categorizeWithContext(
     }
   }
   
-  // Score do contexto adicional
   if (additionalContext) {
     const normalized = additionalContext.toLowerCase();
     for (const [segment, keywords] of Object.entries(SEGMENT_KEYWORDS_MAP)) {
@@ -499,7 +516,6 @@ export function categorizeWithContext(
     }
   }
   
-  // Retorna o melhor
   const maxScore = Math.max(...Object.values(scores));
   if (maxScore > 0) {
     const bestSegment = Object.entries(scores).find(([_, score]) => score === maxScore);

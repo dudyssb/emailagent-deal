@@ -1,6 +1,6 @@
 import { Segment } from '@/types/email';
 import { cn } from '@/lib/utils';
-import { Building2, Leaf, ShoppingBag, Cpu, HelpCircle, Warehouse, GraduationCap } from 'lucide-react';
+import { Building2, Leaf, ShoppingBag, Cpu, HelpCircle, Warehouse, GraduationCap, Factory, HeartPulse, Lightbulb } from 'lucide-react';
 
 interface SegmentBadgeProps {
   segment: Segment;
@@ -25,13 +25,21 @@ const SEGMENT_CONFIG: Record<Segment, { icon: typeof Building2; className: strin
     icon: Warehouse,
     className: 'segment-badge-atacado',
   },
-  'Tech/Indústria/Inovação': {
-    icon: Cpu,
+  'Tech/Inovação': {
+    icon: Lightbulb,
     className: 'segment-badge-tech',
+  },
+  'Indústria': {
+    icon: Factory,
+    className: 'segment-badge-industria',
   },
   'Educação': {
     icon: GraduationCap,
     className: 'segment-badge-educacao',
+  },
+  'Saúde': {
+    icon: HeartPulse,
+    className: 'segment-badge-saude',
   },
   'Outros': {
     icon: HelpCircle,
@@ -53,6 +61,7 @@ const ICON_SIZES = {
 
 export function SegmentBadge({ segment, size = 'md', showIcon = true }: SegmentBadgeProps) {
   const config = SEGMENT_CONFIG[segment];
+  if (!config) return <span className="text-xs text-muted-foreground">{segment}</span>;
   const Icon = config.icon;
 
   return (

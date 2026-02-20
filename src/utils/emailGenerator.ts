@@ -1,4 +1,4 @@
-import { EmailContact, NurturingEmail, Segment } from '@/types/email';
+import { EmailContact, NurturingEmail, Segment, ALL_SEGMENTS } from '@/types/email';
 import { 
   SUCCESS_CASES, 
   SuccessCase, 
@@ -15,7 +15,6 @@ import {
   selectBestMaterialForSegment 
 } from '@/data/richMaterials';
 
-// Variável E-goi para nome do lead
 const EGOI_NAME_VAR = '!fname';
 
 const SENDER_INFO = {
@@ -24,14 +23,15 @@ const SENDER_INFO = {
   phone: '(41) 99156-0342',
 };
 
-// Mapeamento de segmentos para versão curta usada no email 1
 const SEGMENT_SHORT_NAMES: Record<Segment, string> = {
   'Mercado Financeiro': 'finance',
   'Agro/relacionados': 'agro',
   'Varejo': 'varejo',
   'Atacado': 'atacado',
-  'Tech/Indústria/Inovação': 'inovação',
+  'Tech/Inovação': 'inovação',
+  'Indústria': 'indústria',
   'Educação': 'educação',
+  'Saúde': 'saúde',
   'Outros': 'negócios',
 };
 
@@ -60,17 +60,29 @@ const SEGMENT_PAIN_POINTS: Record<Segment, string[]> = {
     'controle de estoque e armazenagem',
     'competitividade de preços e margens',
   ],
-  'Tech/Indústria/Inovação': [
+  'Tech/Inovação': [
     'escalabilidade de soluções',
     'atração e retenção de talentos',
     'time-to-market de produtos',
     'integração de sistemas',
+  ],
+  'Indústria': [
+    'eficiência operacional e automação',
+    'manutenção preditiva e IoT',
+    'cadeia de suprimentos e logística',
+    'transformação digital na produção',
   ],
   'Educação': [
     'transformação digital no ensino',
     'gestão de plataformas de aprendizado',
     'engajamento de alunos e retenção',
     'escalabilidade de conteúdo educacional',
+  ],
+  'Saúde': [
+    'gestão de prontuários e dados clínicos',
+    'conformidade regulatória e LGPD',
+    'telemedicina e atendimento digital',
+    'integração de sistemas hospitalares',
   ],
   'Outros': [
     'transformação digital',
@@ -80,12 +92,10 @@ const SEGMENT_PAIN_POINTS: Record<Segment, string[]> = {
   ],
 };
 
-// Helper function to get short segment name
 function getShortSegmentName(segmento: Segment): string {
   return SEGMENT_SHORT_NAMES[segmento] || 'negócios';
 }
 
-// Configuração de geração de emails
 export interface EmailGenerationConfig {
   segment: Segment;
   selectedCaseResultType?: CaseResultType;
@@ -93,7 +103,6 @@ export interface EmailGenerationConfig {
   companyContext?: string;
 }
 
-// Helper: resolve the selected case
 function resolveCase(segmento: Segment, config: EmailGenerationConfig): SuccessCase | undefined {
   if (config.selectedCaseId) {
     const allCases = getCasesBySegment(segmento);
@@ -102,7 +111,7 @@ function resolveCase(segmento: Segment, config: EmailGenerationConfig): SuccessC
   return getBestCaseForSegment(segmento, config.selectedCaseResultType);
 }
 
-// Email 1: Parceria estratégica - adapta o texto com base no case escolhido para Email 2
+// Email 1: Parceria estratégica
 const emailTemplate1 = {
   subject: (segmento: Segment) => {
     const shortName = getShortSegmentName(segmento);
@@ -112,7 +121,6 @@ const emailTemplate1 = {
     const shortName = getShortSegmentName(segmento);
     const chosenCase = resolveCase(segmento, config);
 
-    // Se há um case escolhido, referenciar o desafio dele no Email 1
     if (chosenCase) {
       return `
         <p>Olá ${EGOI_NAME_VAR},</p>
@@ -131,7 +139,7 @@ const emailTemplate1 = {
   },
 };
 
-// Email 2: Case de sucesso (usa case selecionado ou automático)
+// Email 2: Case de sucesso
 const emailTemplate2 = {
   subject: (segmento: Segment, config: EmailGenerationConfig) => {
     const successCase = resolveCase(segmento, config);
@@ -166,7 +174,7 @@ const emailTemplate2 = {
   },
 };
 
-// Email 3: Material exclusivo (seleção automática baseada no contexto)
+// Email 3: Material exclusivo
 const emailTemplate3 = {
   subject: (segmento: Segment, config: EmailGenerationConfig) => {
     const material = selectBestMaterialForSegment(segmento, config.companyContext);
@@ -176,7 +184,7 @@ const emailTemplate3 = {
     const material = selectBestMaterialForSegment(segmento, config.companyContext);
     
     const topicosHTML = material.topicos
-      .slice(0, 5) // Máximo 5 tópicos
+      .slice(0, 5)
       .map(t => `<li>${t}</li>`)
       .join('\n          ');
     
@@ -217,10 +225,7 @@ const EMAIL_TEMPLATES: EmailTemplate[] = [
   emailTemplate4 as EmailTemplate,
 ];
 
-function generateEmailHTML(
-  subject: string,
-  bodyContent: string
-): string {
+function generateEmailHTML(subject: string, bodyContent: string): string {
   return `<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -228,85 +233,27 @@ function generateEmailHTML(
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${subject}</title>
   <style>
-    body {
-      font-family: Arial, Helvetica, sans-serif;
-      line-height: 1.6;
-      color: #333333;
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    .header {
-      border-bottom: 2px solid #0066CC;
-      padding-bottom: 20px;
-      margin-bottom: 20px;
-    }
-    .logo {
-      color: #0066CC;
-      font-size: 24px;
-      font-weight: bold;
-    }
-    .content {
-      padding: 20px 0;
-    }
-    .content p {
-      margin: 0 0 15px 0;
-    }
-    .content ul {
-      margin: 15px 0;
-      padding-left: 20px;
-    }
-    .content li {
-      margin-bottom: 8px;
-    }
-    .signature {
-      border-top: 1px solid #eeeeee;
-      padding-top: 20px;
-      margin-top: 30px;
-    }
-    .signature-name {
-      font-weight: bold;
-      color: #0066CC;
-      font-size: 16px;
-    }
-    .signature-title {
-      color: #666666;
-      font-size: 14px;
-    }
-    .signature-contact {
-      margin-top: 10px;
-      font-size: 13px;
-      color: #666666;
-    }
-    .signature-contact a {
-      color: #0066CC;
-      text-decoration: none;
-    }
-    .cta-button {
-      display: inline-block;
-      background-color: #0066CC;
-      color: white !important;
-      padding: 12px 24px;
-      text-decoration: none;
-      border-radius: 5px;
-      margin: 20px 0;
-      font-weight: bold;
-    }
+    body { font-family: Arial, Helvetica, sans-serif; line-height: 1.6; color: #333333; max-width: 600px; margin: 0 auto; padding: 20px; }
+    .header { border-bottom: 2px solid #0066CC; padding-bottom: 20px; margin-bottom: 20px; }
+    .logo { color: #0066CC; font-size: 24px; font-weight: bold; }
+    .content { padding: 20px 0; }
+    .content p { margin: 0 0 15px 0; }
+    .content ul { margin: 15px 0; padding-left: 20px; }
+    .content li { margin-bottom: 8px; }
+    .signature { border-top: 1px solid #eeeeee; padding-top: 20px; margin-top: 30px; }
+    .signature-name { font-weight: bold; color: #0066CC; font-size: 16px; }
+    .signature-title { color: #666666; font-size: 14px; }
+    .signature-contact { margin-top: 10px; font-size: 13px; color: #666666; }
+    .signature-contact a { color: #0066CC; text-decoration: none; }
+    .cta-button { display: inline-block; background-color: #0066CC; color: white !important; padding: 12px 24px; text-decoration: none; border-radius: 5px; margin: 20px 0; font-weight: bold; }
   </style>
 </head>
 <body>
-  <div class="header">
-    <div class="logo">Deal</div>
-  </div>
-  
+  <div class="header"><div class="logo">Deal</div></div>
   <div class="content">
     ${bodyContent}
-    
-    <a href="mailto:${SENDER_INFO.email}?subject=Re: ${encodeURIComponent(subject)}" class="cta-button">
-      Agendar Conversa
-    </a>
+    <a href="mailto:${SENDER_INFO.email}?subject=Re: ${encodeURIComponent(subject)}" class="cta-button">Agendar Conversa</a>
   </div>
-  
   <div class="signature">
     <div class="signature-name">${SENDER_INFO.name}</div>
     <div class="signature-title">Executiva de Novos Negócios | Deal</div>
@@ -320,16 +267,12 @@ function generateEmailHTML(
 </html>`;
 }
 
-// Gera 4 templates de email para um segmento com configuração
 export function generateSegmentEmailTemplates(
   segment: Segment,
   config?: Partial<EmailGenerationConfig>
 ): NurturingEmail[] {
   const painPoints = SEGMENT_PAIN_POINTS[segment];
-  const fullConfig: EmailGenerationConfig = {
-    segment,
-    ...config,
-  };
+  const fullConfig: EmailGenerationConfig = { segment, ...config };
   
   return EMAIL_TEMPLATES.map((template, index) => {
     const painPoint = painPoints[index % painPoints.length];
@@ -347,7 +290,6 @@ export function generateSegmentEmailTemplates(
   });
 }
 
-// Mantém compatibilidade - agora gera templates por segmento
 export function generateAllEmailsForSegment(
   _contacts: EmailContact[],
   segment: Segment,
@@ -356,20 +298,10 @@ export function generateAllEmailsForSegment(
   return generateSegmentEmailTemplates(segment, config);
 }
 
-// Exporta todos os segmentos disponíveis
-export const ALL_SEGMENTS: Segment[] = [
-  'Mercado Financeiro',
-  'Agro/relacionados',
-  'Varejo',
-  'Atacado',
-  'Tech/Indústria/Inovação',
-  'Educação',
-  'Outros',
-];
+export { ALL_SEGMENTS };
 
 // ============ FUNÇÕES PARA UI DE SELEÇÃO ============
 
-// Retorna os tipos de resultado de case disponíveis para um segmento
 export function getCaseResultTypesForSegment(segment: Segment): {
   type: CaseResultType;
   label: string;
@@ -383,33 +315,22 @@ export function getCaseResultTypesForSegment(segment: Segment): {
   }));
 }
 
-// Retorna cases filtrados por segmento e tipo de resultado
 export function getCasesForSegmentAndType(segment: Segment, resultType: CaseResultType): SuccessCase[] {
   return getCasesBySegmentAndType(segment, resultType);
 }
 
-// Retorna os materiais disponíveis para um segmento
 export function getMaterialsForSegment(segment: Segment): RichMaterial[] {
   return getMaterialsBySegment(segment);
 }
 
-// Retorna o case que será usado para um segmento e tipo
-export function getPreviewCase(
-  segment: Segment, 
-  resultType?: CaseResultType
-): SuccessCase | undefined {
+export function getPreviewCase(segment: Segment, resultType?: CaseResultType): SuccessCase | undefined {
   return getBestCaseForSegment(segment, resultType);
 }
 
-// Retorna o material que será usado para um segmento
-export function getPreviewMaterial(
-  segment: Segment,
-  companyContext?: string
-): RichMaterial {
+export function getPreviewMaterial(segment: Segment, companyContext?: string): RichMaterial {
   return selectBestMaterialForSegment(segment, companyContext);
 }
 
-// Re-exporta tipos e funções úteis
 export type { CaseResultType, SuccessCase } from '@/data/successCases';
 export type { RichMaterial } from '@/data/richMaterials';
 export { RESULT_TYPE_LABELS } from '@/data/successCases';

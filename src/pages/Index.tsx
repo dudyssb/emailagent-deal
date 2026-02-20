@@ -10,12 +10,36 @@ import { EmailPreview } from '@/components/EmailPreview';
 import { MetricsDashboard } from '@/components/MetricsDashboard';
 import { ExportPanel } from '@/components/ExportPanel';
 import { CaseSelection } from '@/components/CaseSelection';
+import { EmailHistory } from '@/components/EmailHistory';
 import { parseCSV, parseMetricsCSV } from '@/utils/csvParser';
 import { generateAllEmailsForSegment, CaseResultType, EmailGenerationConfig } from '@/utils/emailGenerator';
-import { EmailContact, ValidationError, Segment, CampaignMetrics, NurturingEmail } from '@/types/email';
+import { EmailContact, ValidationError, Segment, CampaignMetrics, NurturingEmail, createEmptySegmentCounts } from '@/types/email';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/AuthContext';
 import { Sparkles, Upload } from 'lucide-react';
+
+// History entry type
+export interface HistoryEntry {
+  id: string;
+  date: string;
+  segment: Segment;
+  contactCount: number;
+  emails: NurturingEmail[];
+  caseUsed?: string;
+}
+
+const HISTORY_KEY = 'email-agent-history';
+
+function loadHistory(): HistoryEntry[] {
+  try {
+    const data = localStorage.getItem(HISTORY_KEY);
+    return data ? JSON.parse(data) : [];
+  } catch { return []; }
+}
+
+function saveHistory(entries: HistoryEntry[]) {
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(entries));
+}
 
 export default function Index() {
   const { logout } = useAuth();
@@ -23,28 +47,12 @@ export default function Index() {
   const [activeTab, setActiveTab] = useState<TabType>('import');
   const [contacts, setContacts] = useState<EmailContact[]>([]);
   const [errors, setErrors] = useState<ValidationError[]>([]);
-  const [segmentCounts, setSegmentCounts] = useState<Record<Segment, number>>({
-    'Mercado Financeiro': 0,
-    'Agro/relacionados': 0,
-    'Varejo': 0,
-    'Atacado': 0,
-    'Tech/Indústria/Inovação': 0,
-    'Educação': 0,
-    'Outros': 0,
-  });
+  const [segmentCounts, setSegmentCounts] = useState<Record<Segment, number>>(createEmptySegmentCounts);
 
   const updateSegmentCounts = useCallback((contactList: EmailContact[]) => {
-    const counts: Record<Segment, number> = {
-      'Mercado Financeiro': 0,
-      'Agro/relacionados': 0,
-      'Varejo': 0,
-      'Atacado': 0,
-      'Tech/Indústria/Inovação': 0,
-      'Educação': 0,
-      'Outros': 0,
-    };
+    const counts = createEmptySegmentCounts();
     contactList.forEach(c => {
-      if (c.segmento) counts[c.segmento]++;
+      if (c.segmento && counts[c.segmento] !== undefined) counts[c.segmento]++;
     });
     setSegmentCounts(counts);
   }, []);
@@ -58,6 +66,7 @@ export default function Index() {
       return updated;
     });
   }, [updateSegmentCounts]);
+
   const [selectedSegment, setSelectedSegment] = useState<Segment | null>(null);
   const [selectedCaseResultType, setSelectedCaseResultType] = useState<CaseResultType | undefined>(undefined);
   const [selectedCaseId, setSelectedCaseId] = useState<string | undefined>(undefined);
@@ -66,6 +75,7 @@ export default function Index() {
   const [metrics, setMetrics] = useState<CampaignMetrics[]>([]);
   const [metricsErrors, setMetricsErrors] = useState<ValidationError[]>([]);
   const [isProcessingMetrics, setIsProcessingMetrics] = useState(false);
+  const [history, setHistory] = useState<HistoryEntry[]>(loadHistory);
 
   const handleAddContact = useCallback((contact: EmailContact) => {
     setContacts(prev => {
@@ -77,14 +87,12 @@ export default function Index() {
 
   const handleFileLoad = useCallback((content: string, file?: File) => {
     setIsProcessing(true);
-    
     setTimeout(() => {
       const result = parseCSV(content);
       setContacts(result.contacts);
       setErrors(result.errors);
       setSegmentCounts(result.segmentCounts);
       setIsProcessing(false);
-      
       if (result.contacts.length > 0 && result.errors.length === 0) {
         setActiveTab('contacts');
       }
@@ -112,18 +120,36 @@ export default function Index() {
     
     const emails = generateAllEmailsForSegment(contacts, selectedSegment, config);
     setGeneratedEmails(emails);
+
+    // Save to history
+    const entry: HistoryEntry = {
+      id: Date.now().toString(),
+      date: new Date().toISOString(),
+      segment: selectedSegment,
+      contactCount: segmentCounts[selectedSegment] || 0,
+      emails,
+      caseUsed: selectedCaseId,
+    };
+    const updated = [entry, ...history].slice(0, 50); // keep last 50
+    setHistory(updated);
+    saveHistory(updated);
+
     setActiveTab('emails');
-  }, [contacts, selectedSegment, selectedCaseResultType, selectedCaseId]);
+  }, [contacts, selectedSegment, selectedCaseResultType, selectedCaseId, segmentCounts, history]);
 
   const handleMetricsFileLoad = useCallback((content: string) => {
     setIsProcessingMetrics(true);
-    
     setTimeout(() => {
       const result = parseMetricsCSV(content);
       setMetrics(result.metrics);
       setMetricsErrors(result.errors);
       setIsProcessingMetrics(false);
     }, 500);
+  }, []);
+
+  const handleClearHistory = useCallback(() => {
+    setHistory([]);
+    saveHistory([]);
   }, []);
 
   const hasData = contacts.length > 0;
@@ -287,6 +313,19 @@ export default function Index() {
               emails={generatedEmails}
               segmentCounts={segmentCounts}
             />
+          </div>
+        );
+
+      case 'history':
+        return (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold text-foreground mb-2">Histórico</h2>
+              <p className="text-muted-foreground">
+                Emails gerados anteriormente, organizados por segmento.
+              </p>
+            </div>
+            <EmailHistory entries={history} onClear={handleClearHistory} />
           </div>
         );
     }

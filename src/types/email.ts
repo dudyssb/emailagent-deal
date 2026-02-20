@@ -3,8 +3,10 @@ export type Segment =
   | 'Agro/relacionados' 
   | 'Varejo' 
   | 'Atacado'
-  | 'Tech/Indústria/Inovação' 
+  | 'Tech/Inovação'
+  | 'Indústria'
   | 'Educação'
+  | 'Saúde'
   | 'Outros';
 
 export interface EmailContact {
@@ -66,4 +68,32 @@ export interface NurturingEmail {
   htmlContent: string;
   targetContact: EmailContact;
   sequence: number;
+}
+
+// Helper to get all segments
+export const ALL_SEGMENTS: Segment[] = [
+  'Mercado Financeiro',
+  'Agro/relacionados',
+  'Varejo',
+  'Atacado',
+  'Tech/Inovação',
+  'Indústria',
+  'Educação',
+  'Saúde',
+  'Outros',
+];
+
+// Helper to create empty segment counts
+export function createEmptySegmentCounts(): Record<Segment, number> {
+  return {
+    'Mercado Financeiro': 0,
+    'Agro/relacionados': 0,
+    'Varejo': 0,
+    'Atacado': 0,
+    'Tech/Inovação': 0,
+    'Indústria': 0,
+    'Educação': 0,
+    'Saúde': 0,
+    'Outros': 0,
+  };
 }

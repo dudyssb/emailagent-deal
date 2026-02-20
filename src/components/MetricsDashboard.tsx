@@ -22,8 +22,10 @@ const SEGMENT_COLORS: Record<Segment, string> = {
   'Agro/relacionados': 'hsl(142, 76%, 36%)',
   'Varejo': 'hsl(280, 65%, 55%)',
   'Atacado': 'hsl(25, 80%, 50%)',
-  'Tech/Indústria/Inovação': 'hsl(199, 89%, 48%)',
+  'Tech/Inovação': 'hsl(199, 89%, 48%)',
+  'Indústria': 'hsl(45, 80%, 45%)',
   'Educação': 'hsl(340, 65%, 50%)',
+  'Saúde': 'hsl(160, 60%, 40%)',
   'Outros': 'hsl(220, 10%, 50%)',
 };
 
