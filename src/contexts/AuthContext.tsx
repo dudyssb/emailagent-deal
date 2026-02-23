@@ -8,8 +8,10 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-const VALID_USERNAME = 'DudaBastos';
-const VALID_PASSWORD = 'Ld2LCumdiJ24';
+const VALID_USERS = [
+  { username: 'DudaBastos', password: 'Ld2LCumdiJ24' },
+  { username: 'KarineSoares', password: 'Deal@2026' }
+];
 const AUTH_KEY = 'email_agent_auth';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -22,8 +24,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const login = (username: string, password: string): boolean => {
-    if (username === VALID_USERNAME && password === VALID_PASSWORD) {
+  const login = (inputUsername: string, inputPassword: string): boolean => {
+    const isValid = VALID_USERS.some(
+      (user) => user.username === inputUsername && user.password === inputPassword
+    );
+
+    if (isValid) {
       setIsAuthenticated(true);
       sessionStorage.setItem(AUTH_KEY, 'true');
       return true;
