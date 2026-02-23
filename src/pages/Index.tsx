@@ -11,6 +11,7 @@ import { MetricsDashboard } from '@/components/MetricsDashboard';
 import { ExportPanel } from '@/components/ExportPanel';
 import { CaseSelection } from '@/components/CaseSelection';
 import { EmailHistory } from '@/components/EmailHistory';
+import { ManualEmailGenerator } from '@/components/ManualEmailGenerator';
 import { parseCSV, parseMetricsCSV } from '@/utils/csvParser';
 import { generateAllEmailsForSegment, CaseResultType, EmailGenerationConfig } from '@/utils/emailGenerator';
 import { EmailContact, ValidationError, Segment, CampaignMetrics, NurturingEmail, createEmptySegmentCounts } from '@/types/email';
@@ -59,7 +60,7 @@ export default function Index() {
 
   const handleUpdateContactSegment = useCallback((email: string, newSegment: Segment) => {
     setContacts(prev => {
-      const updated = prev.map(c => 
+      const updated = prev.map(c =>
         c.email === email ? { ...c, segmento: newSegment } : c
       );
       updateSegmentCounts(updated);
@@ -112,12 +113,12 @@ export default function Index() {
 
   const handleGenerateEmails = useCallback(() => {
     if (!selectedSegment) return;
-    
+
     const config: Partial<EmailGenerationConfig> = {
       selectedCaseResultType,
       selectedCaseId,
     };
-    
+
     const emails = generateAllEmailsForSegment(contacts, selectedSegment, config);
     setGeneratedEmails(emails);
 
@@ -168,9 +169,9 @@ export default function Index() {
 
             <ManualLeadEntry onAddContact={handleAddContact} />
 
-            <FileUploader 
-              onFileLoad={handleFileLoad} 
-              isLoading={isProcessing} 
+            <FileUploader
+              onFileLoad={handleFileLoad}
+              isLoading={isProcessing}
               showReupload={hasData}
               requiredColumns="Colunas obrigatórias: nome e email"
             />
@@ -194,7 +195,7 @@ export default function Index() {
                       selectedCaseId={selectedCaseId}
                       onSelectCaseId={setSelectedCaseId}
                     />
-                    
+
                     <div className="flex flex-col justify-center items-center p-6 rounded-xl border border-primary/20 bg-primary/5">
                       <Sparkles className="w-10 h-10 text-primary mb-3" />
                       <h3 className="text-lg font-semibold text-foreground mb-2">
@@ -242,8 +243,8 @@ export default function Index() {
                 />
               </div>
               <div className="lg:col-span-3">
-                <ContactsTable 
-                  contacts={contacts} 
+                <ContactsTable
+                  contacts={contacts}
                   selectedSegment={selectedSegment}
                   onSelectSegment={setSelectedSegment}
                   onUpdateSegment={handleUpdateContactSegment}
@@ -257,26 +258,20 @@ export default function Index() {
         return (
           <div className="space-y-6">
             <div>
-              <h2 className="text-2xl font-bold text-foreground mb-2">E-mails de Nutrição</h2>
+              <h2 className="text-2xl font-bold text-foreground mb-2">E-mails de Nutrição e Criação Manual</h2>
               <p className="text-muted-foreground">
-                Visualize e baixe os e-mails gerados para importação no E-goi.
+                Visualize os e-mails gerados ou crie novos a partir de prompts, imagens e HTML.
               </p>
             </div>
 
-            {generatedEmails.length === 0 ? (
-              <div className="rounded-xl border border-border bg-card p-12 text-center">
-                <Sparkles className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                <h3 className="text-lg font-semibold text-foreground mb-2">Nenhum e-mail gerado</h3>
-                <p className="text-muted-foreground mb-4">
-                  Selecione um segmento na aba de contatos e clique em "Gerar E-mails".
-                </p>
-                <Button onClick={() => setActiveTab('contacts')}>
-                  <Upload className="w-4 h-4 mr-2" />
-                  Ir para Contatos
-                </Button>
+            <ManualEmailGenerator
+              onGenerate={(newEmails) => setGeneratedEmails(prev => [...newEmails, ...prev])}
+            />
+
+            {generatedEmails.length > 0 && (
+              <div className="pt-4 border-t border-border">
+                <EmailPreview emails={generatedEmails} />
               </div>
-            ) : (
-              <EmailPreview emails={generatedEmails} />
             )}
           </div>
         );
@@ -290,8 +285,8 @@ export default function Index() {
                 Importe um CSV com métricas ou visualize o dashboard de desempenho.
               </p>
             </div>
-            <MetricsDashboard 
-              metrics={metrics} 
+            <MetricsDashboard
+              metrics={metrics}
               errors={metricsErrors}
               onFileLoad={handleMetricsFileLoad}
               isLoading={isProcessingMetrics}
@@ -334,7 +329,7 @@ export default function Index() {
   return (
     <div className="flex min-h-screen bg-background">
       <Sidebar activeTab={activeTab} onTabChange={setActiveTab} hasData={hasData} onLogout={handleLogout} />
-      
+
       <main className="flex-1 p-8 overflow-auto">
         <div className="max-w-6xl mx-auto">
           {renderContent()}

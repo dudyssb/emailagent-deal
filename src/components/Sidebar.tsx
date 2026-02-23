@@ -12,7 +12,7 @@ interface SidebarProps {
 const TABS = [
   { id: 'import' as TabType, label: 'Importar CSV', icon: Upload },
   { id: 'contacts' as TabType, label: 'Contatos', icon: Users, requiresData: true },
-  { id: 'emails' as TabType, label: 'E-mails', icon: Mail, requiresData: true },
+  { id: 'emails' as TabType, label: 'E-mails', icon: Mail },
   { id: 'metrics' as TabType, label: 'Métricas', icon: BarChart3 },
   { id: 'export' as TabType, label: 'Exportar', icon: FileDown, requiresData: true },
   { id: 'history' as TabType, label: 'Histórico', icon: History },
@@ -57,7 +57,7 @@ export function Sidebar({ activeTab, onTabChange, hasData, onLogout }: SidebarPr
 
       {/* Footer */}
       <div className="pt-4 border-t border-border">
-        <button 
+        <button
           onClick={onLogout}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
         >
