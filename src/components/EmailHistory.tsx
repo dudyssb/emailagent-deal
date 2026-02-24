@@ -1,19 +1,20 @@
 import { useState } from 'react';
 import { NurturingEmail, Segment, EmailContact } from '@/types/email';
 import { SegmentBadge } from './SegmentBadge';
-import { History, Trash2, ChevronDown, ChevronUp, Mail, Calendar, Users, FileText } from 'lucide-react';
+import { History, Trash2, ChevronDown, ChevronUp, Mail, Calendar, Users, FileText, Search } from 'lucide-react';
 import { Button } from './ui/button';
 
 export interface HistoryEntry {
   id: string;
   date: string;
-  type?: 'emails' | 'list';
+  type?: 'emails' | 'list' | 'presales';
   segment?: Segment;
   contactCount: number;
   emails?: NurturingEmail[];
   caseUsed?: string;
   listName?: string;
   contacts?: EmailContact[];
+  preSalesData?: any[];
 }
 
 interface EmailHistoryProps {
@@ -64,6 +65,11 @@ export function EmailHistory({ entries, onClear }: EmailHistoryProps) {
                       <FileText className="w-5 h-5 text-primary" />
                       <span className="font-semibold text-foreground text-sm">{entry.listName}</span>
                     </div>
+                  ) : entry.type === 'presales' ? (
+                    <div className="flex items-center gap-2">
+                      <Search className="w-5 h-5 text-primary" />
+                      <span className="font-semibold text-foreground text-sm">Pesquisa: Pré-vendas</span>
+                    </div>
                   ) : (
                     entry.segment && <SegmentBadge segment={entry.segment} size="sm" />
                   )}
@@ -75,9 +81,9 @@ export function EmailHistory({ entries, onClear }: EmailHistoryProps) {
                     </span>
                     <span className="flex items-center gap-1">
                       <Users className="w-3.5 h-3.5" />
-                      {entry.contactCount} contatos
+                      {entry.contactCount} empresas
                     </span>
-                    {!isList && (
+                    {entry.type === 'emails' && (
                       <span className="flex items-center gap-1">
                         <Mail className="w-3.5 h-3.5" />
                         {entry.emails?.length || 0} emails
@@ -149,6 +155,41 @@ export function EmailHistory({ entries, onClear }: EmailHistoryProps) {
                           </tbody>
                         </table>
                       </div>
+                    </div>
+                  ) : entry.type === 'presales' && entry.preSalesData ? (
+                    <div className="overflow-x-auto">
+                      <table className="w-full text-sm">
+                        <thead>
+                          <tr className="bg-muted/50 border-b border-border">
+                            <th className="text-left px-4 py-2 font-semibold">Empresa</th>
+                            {entry.preSalesData[0]?.segment && <th className="text-left px-4 py-2 font-semibold">Segmento</th>}
+                            {entry.preSalesData[0]?.revenue && <th className="text-left px-4 py-2 font-semibold">Faturamento</th>}
+                            {entry.preSalesData[0]?.employees && <th className="text-left px-4 py-2 font-semibold">Funcionários</th>}
+                            {entry.preSalesData[0]?.data_company && <th className="text-left px-4 py-2 font-semibold">Data</th>}
+                            {entry.preSalesData[0]?.cloud_company && <th className="text-left px-4 py-2 font-semibold">Cloud</th>}
+                            {entry.preSalesData[0]?.news && <th className="text-left px-4 py-2 font-semibold">Notícias</th>}
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {entry.preSalesData.map((d, i) => (
+                            <tr key={i} className="border-b border-border/50 hover:bg-muted/20">
+                              <td className="px-4 py-3">{d.empresa}</td>
+                              {d.segment && <td className="px-4 py-3">{d.segment}</td>}
+                              {d.revenue && <td className="px-4 py-3">{d.revenue}</td>}
+                              {d.employees && <td className="px-4 py-3">{d.employees}</td>}
+                              {d.data_company && <td className="px-4 py-3">{d.data_company}</td>}
+                              {d.cloud_company && <td className="px-4 py-3">{d.cloud_company}</td>}
+                              {d.news && (
+                                <td className="px-4 py-3">
+                                  <a href={d.news} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                                    Ver Notícias
+                                  </a>
+                                </td>
+                              )}
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
                   ) : (
                     entry.emails?.map((email) => (

@@ -1,7 +1,7 @@
-import { Upload, Users, Mail, BarChart3, FileDown, LogOut, History } from 'lucide-react';
+import { Upload, Users, Mail, BarChart3, FileDown, LogOut, History, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-export type TabType = 'import' | 'contacts' | 'emails' | 'metrics' | 'export' | 'history';
+export type TabType = 'import' | 'contacts' | 'emails' | 'presales' | 'metrics' | 'export' | 'history';
 interface SidebarProps {
   activeTab: TabType;
   onTabChange: (tab: TabType) => void;
@@ -13,6 +13,7 @@ const TABS = [
   { id: 'import' as TabType, label: 'Importar CSV', icon: Upload },
   { id: 'contacts' as TabType, label: 'Contatos', icon: Users, requiresData: true },
   { id: 'emails' as TabType, label: 'E-mails', icon: Mail },
+  { id: 'presales' as TabType, label: 'Infos Pré-venda', icon: Search },
   { id: 'metrics' as TabType, label: 'Métricas', icon: BarChart3 },
   { id: 'export' as TabType, label: 'Exportar', icon: FileDown, requiresData: true },
   { id: 'history' as TabType, label: 'Histórico', icon: History },

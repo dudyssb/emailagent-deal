@@ -12,6 +12,7 @@ import { ExportPanel } from '@/components/ExportPanel';
 import { CaseSelection } from '@/components/CaseSelection';
 import { EmailHistory } from '@/components/EmailHistory';
 import { ManualEmailGenerator } from '@/components/ManualEmailGenerator';
+import { PreSalesInfo } from '@/components/PreSalesInfo';
 import { parseCSV, parseMetricsCSV } from '@/utils/csvParser';
 import { generateAllEmailsForSegment, CaseResultType, EmailGenerationConfig } from '@/utils/emailGenerator';
 import { EmailContact, ValidationError, Segment, CampaignMetrics, NurturingEmail, createEmptySegmentCounts } from '@/types/email';
@@ -23,10 +24,14 @@ import { Sparkles, Upload } from 'lucide-react';
 export interface HistoryEntry {
   id: string;
   date: string;
-  segment: Segment;
+  type?: 'emails' | 'list' | 'presales';
+  segment?: Segment;
   contactCount: number;
-  emails: NurturingEmail[];
+  emails?: NurturingEmail[];
   caseUsed?: string;
+  listName?: string;
+  contacts?: EmailContact[];
+  preSalesData?: any[];
 }
 
 const HISTORY_KEY = 'email-agent-history';
@@ -273,6 +278,32 @@ export default function Index() {
                 <EmailPreview emails={generatedEmails} />
               </div>
             )}
+          </div>
+        );
+
+      case 'presales':
+        return (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold text-foreground mb-2">Informações Pré-venda</h2>
+              <p className="text-muted-foreground">
+                Faça upload de uma lista de empresas para o agente buscar informações online.
+              </p>
+            </div>
+            <PreSalesInfo
+              onResultsGenerated={(results) => {
+                const entry: HistoryEntry = {
+                  id: Date.now().toString(),
+                  date: new Date().toISOString(),
+                  type: 'presales',
+                  contactCount: results.length,
+                  preSalesData: results,
+                };
+                const updated = [entry, ...history].slice(0, 50);
+                setHistory(updated);
+                saveHistory(updated);
+              }}
+            />
           </div>
         );
 
