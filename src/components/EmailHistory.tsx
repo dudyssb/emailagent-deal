@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { NurturingEmail, Segment, EmailContact } from '@/types/email';
 import { SegmentBadge } from './SegmentBadge';
-import { History, Trash2, ChevronDown, ChevronUp, Mail, Calendar, Users, FileText, Search } from 'lucide-react';
+import { History, Trash2, ChevronDown, ChevronUp, Mail, Calendar, Users, FileText, Search, Download } from 'lucide-react';
 import { Button } from './ui/button';
+import * as XLSX from 'xlsx';
 
 export interface HistoryEntry {
   id: string;
@@ -24,6 +25,22 @@ interface EmailHistoryProps {
 
 export function EmailHistory({ entries, onClear }: EmailHistoryProps) {
   const [expandedId, setExpandedId] = useState<string | null>(null);
+
+  const downloadPreSalesExcel = (entry: HistoryEntry) => {
+    if (!entry.preSalesData || entry.preSalesData.length === 0) return;
+
+    // Create worksheet
+    const worksheet = XLSX.utils.json_to_sheet(entry.preSalesData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Resultados");
+
+    // Generate filename based on date
+    const date = new Date(entry.date).toISOString().split('T')[0];
+    const fileName = `pre_venda_${date}_${entry.id.substring(0, 5)}.xlsx`;
+
+    // Download
+    XLSX.writeFile(workbook, fileName);
+  };
 
   if (entries.length === 0) {
     return (
@@ -55,47 +72,64 @@ export function EmailHistory({ entries, onClear }: EmailHistoryProps) {
 
           return (
             <div key={entry.id} className="rounded-xl border border-border bg-card overflow-hidden animate-scale-in">
-              <button
-                onClick={() => setExpandedId(isExpanded ? null : entry.id)}
-                className="w-full flex items-center justify-between p-4 hover:bg-muted/30 transition-colors"
-              >
-                <div className="flex items-center gap-4">
-                  {isList ? (
-                    <div className="flex items-center gap-2">
-                      <FileText className="w-5 h-5 text-primary" />
-                      <span className="font-semibold text-foreground text-sm">{entry.listName}</span>
-                    </div>
-                  ) : entry.type === 'presales' ? (
-                    <div className="flex items-center gap-2">
-                      <Search className="w-5 h-5 text-primary" />
-                      <span className="font-semibold text-foreground text-sm">Pesquisa: Pré-vendas</span>
-                    </div>
-                  ) : (
-                    entry.segment && <SegmentBadge segment={entry.segment} size="sm" />
-                  )}
-
-                  <div className="flex items-center gap-3 text-sm text-muted-foreground">
-                    <span className="flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5" />
-                      {date.toLocaleDateString('pt-BR')} {date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Users className="w-3.5 h-3.5" />
-                      {entry.contactCount} empresas
-                    </span>
-                    {entry.type === 'emails' && (
-                      <span className="flex items-center gap-1">
-                        <Mail className="w-3.5 h-3.5" />
-                        {entry.emails?.length || 0} emails
-                      </span>
+              <div className="flex items-center">
+                <button
+                  onClick={() => setExpandedId(isExpanded ? null : entry.id)}
+                  className="flex-1 flex items-center justify-between p-4 hover:bg-muted/30 transition-colors text-left"
+                >
+                  <div className="flex items-center gap-4">
+                    {isList ? (
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-5 h-5 text-primary" />
+                        <span className="font-semibold text-foreground text-sm">{entry.listName}</span>
+                      </div>
+                    ) : entry.type === 'presales' ? (
+                      <div className="flex items-center gap-2">
+                        <Search className="w-5 h-5 text-primary" />
+                        <span className="font-semibold text-foreground text-sm">Pesquisa: Pré-vendas</span>
+                      </div>
+                    ) : (
+                      entry.segment && <SegmentBadge segment={entry.segment} size="sm" />
                     )}
+
+                    <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-3.5 h-3.5" />
+                        {date.toLocaleDateString('pt-BR')} {date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Users className="w-3.5 h-3.5" />
+                        {entry.contactCount} empresas
+                      </span>
+                      {entry.type === 'emails' && (
+                        <span className="flex items-center gap-1">
+                          <Mail className="w-3.5 h-3.5" />
+                          {entry.emails?.length || 0} emails
+                        </span>
+                      )}
+                    </div>
                   </div>
-                </div>
-                {isExpanded ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
-              </button>
+                  {isExpanded ? <ChevronUp className="w-4 h-4 text-muted-foreground" /> : <ChevronDown className="w-4 h-4 text-muted-foreground" />}
+                </button>
+
+                {entry.type === 'presales' && (
+                  <div className="pr-4">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => downloadPreSalesExcel(entry)}
+                      className="gap-2 text-primary hover:text-primary hover:bg-primary/10"
+                      title="Baixar planilha Excel"
+                    >
+                      <Download className="w-4 h-4" />
+                      <span className="hidden sm:inline">Download</span>
+                    </Button>
+                  </div>
+                )}
+              </div>
 
               {isExpanded && (
-                <div className="border-t border-border p-4 space-y-3">
+                <div className="border-t border-border p-4 space-y-3 bg-muted/5">
                   {isList ? (
                     <div className="space-y-4">
                       {(() => {
@@ -126,7 +160,7 @@ export function EmailHistory({ entries, onClear }: EmailHistoryProps) {
                         ) : null;
                       })()}
 
-                      <div className="overflow-x-auto">
+                      <div className="overflow-x-auto rounded-lg border border-border">
                         <table className="w-full text-sm">
                           <thead>
                             <tr className="bg-muted/50 border-b border-border">
@@ -157,39 +191,52 @@ export function EmailHistory({ entries, onClear }: EmailHistoryProps) {
                       </div>
                     </div>
                   ) : entry.type === 'presales' && entry.preSalesData ? (
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-sm">
-                        <thead>
-                          <tr className="bg-muted/50 border-b border-border">
-                            <th className="text-left px-4 py-2 font-semibold">Empresa</th>
-                            {entry.preSalesData[0]?.segment && <th className="text-left px-4 py-2 font-semibold">Segmento</th>}
-                            {entry.preSalesData[0]?.revenue && <th className="text-left px-4 py-2 font-semibold">Faturamento</th>}
-                            {entry.preSalesData[0]?.employees && <th className="text-left px-4 py-2 font-semibold">Funcionários</th>}
-                            {entry.preSalesData[0]?.data_company && <th className="text-left px-4 py-2 font-semibold">Data</th>}
-                            {entry.preSalesData[0]?.cloud_company && <th className="text-left px-4 py-2 font-semibold">Cloud</th>}
-                            {entry.preSalesData[0]?.news && <th className="text-left px-4 py-2 font-semibold">Notícias</th>}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {entry.preSalesData.map((d, i) => (
-                            <tr key={i} className="border-b border-border/50 hover:bg-muted/20">
-                              <td className="px-4 py-3">{d.empresa}</td>
-                              {d.segment && <td className="px-4 py-3">{d.segment}</td>}
-                              {d.revenue && <td className="px-4 py-3">{d.revenue}</td>}
-                              {d.employees && <td className="px-4 py-3">{d.employees}</td>}
-                              {d.data_company && <td className="px-4 py-3">{d.data_company}</td>}
-                              {d.cloud_company && <td className="px-4 py-3">{d.cloud_company}</td>}
-                              {d.news && (
-                                <td className="px-4 py-3">
-                                  <a href={d.news} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
-                                    Ver Notícias
-                                  </a>
-                                </td>
-                              )}
+                    <div className="space-y-4">
+                      <div className="flex justify-end sm:hidden">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => downloadPreSalesExcel(entry)}
+                          className="gap-2 text-primary"
+                        >
+                          <Download className="w-4 h-4" />
+                          Baixar Planilha
+                        </Button>
+                      </div>
+                      <div className="overflow-x-auto rounded-lg border border-border">
+                        <table className="w-full text-sm">
+                          <thead>
+                            <tr className="bg-muted/50 border-b border-border">
+                              <th className="text-left px-4 py-2 font-semibold">Empresa</th>
+                              {entry.preSalesData[0]?.segment && <th className="text-left px-4 py-2 font-semibold">Segmento</th>}
+                              {entry.preSalesData[0]?.revenue && <th className="text-left px-4 py-2 font-semibold">Faturamento</th>}
+                              {entry.preSalesData[0]?.employees && <th className="text-left px-4 py-2 font-semibold">Funcionários</th>}
+                              {entry.preSalesData[0]?.data_company && <th className="text-left px-4 py-2 font-semibold">Data</th>}
+                              {entry.preSalesData[0]?.cloud_company && <th className="text-left px-4 py-2 font-semibold">Cloud</th>}
+                              {entry.preSalesData[0]?.news && <th className="text-left px-4 py-2 font-semibold">Notícias</th>}
                             </tr>
-                          ))}
-                        </tbody>
-                      </table>
+                          </thead>
+                          <tbody>
+                            {entry.preSalesData.map((d, i) => (
+                              <tr key={i} className="border-b border-border/50 hover:bg-muted/20">
+                                <td className="px-4 py-3 font-medium">{d.empresa}</td>
+                                {d.segment && <td className="px-4 py-3">{d.segment}</td>}
+                                {d.revenue && <td className="px-4 py-3">{d.revenue}</td>}
+                                {d.employees && <td className="px-4 py-3">{d.employees}</td>}
+                                {d.data_company && <td className="px-4 py-3">{d.data_company}</td>}
+                                {d.cloud_company && <td className="px-4 py-3">{d.cloud_company}</td>}
+                                {d.news && (
+                                  <td className="px-4 py-3">
+                                    <a href={d.news} target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">
+                                      Ver no Google
+                                    </a>
+                                  </td>
+                                )}
+                              </tr>
+                            ))}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
                   ) : (
                     entry.emails?.map((email) => (
