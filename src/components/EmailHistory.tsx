@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { NurturingEmail, Segment, EmailContact } from '@/types/email';
 import { SegmentBadge } from './SegmentBadge';
-import { History, Trash2, ChevronDown, ChevronUp, Mail, Calendar, Users, FileText, Search, Download } from 'lucide-react';
+import { History, Trash2, ChevronDown, ChevronUp, Mail, Calendar, Users, FileText, Search, Download, FileText as PdfIcon } from 'lucide-react';
 import { Button } from './ui/button';
 import * as XLSX from 'xlsx';
+import { jsPDF } from 'jspdf';
+import autoTable from 'jspdf-autotable';
 
 export interface HistoryEntry {
   id: string;
@@ -40,6 +42,57 @@ export function EmailHistory({ entries, onClear }: EmailHistoryProps) {
 
     // Download
     XLSX.writeFile(workbook, fileName);
+  };
+
+  const downloadPreSalesPDF = (entry: HistoryEntry) => {
+    if (!entry.preSalesData || entry.preSalesData.length === 0) return;
+
+    const doc = new jsPDF();
+    const dateStr = new Date(entry.date).toLocaleDateString('pt-BR');
+
+    // Header
+    doc.setFontSize(20);
+    doc.setTextColor(40, 42, 54);
+    doc.text("Relatório de Pesquisa Pré-venda", 14, 22);
+
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(`Gerado em: ${dateStr}`, 14, 30);
+    doc.text(`Total de Empresas: ${entry.contactCount}`, 14, 35);
+
+    // Table configuration
+    const columns = [
+      { header: 'Empresa', dataKey: 'empresa' },
+      { header: 'Segmento', dataKey: 'segment' },
+      { header: 'Faturamento', dataKey: 'revenue' },
+      { header: 'Funcionários', dataKey: 'employees' },
+      { header: 'Data', dataKey: 'data_company' },
+      { header: 'Cloud', dataKey: 'cloud_company' },
+    ];
+
+    const rows = entry.preSalesData.map(d => ({
+      empresa: d.empresa,
+      segment: d.segment || '-',
+      revenue: d.revenue || '-',
+      employees: d.employees || '-',
+      data_company: d.data_company || '-',
+      cloud_company: d.cloud_company || '-',
+    }));
+
+    autoTable(doc, {
+      startY: 45,
+      columns: columns,
+      body: rows,
+      theme: 'grid',
+      headStyles: { fillColor: [79, 70, 229], textColor: [255, 255, 255], fontStyle: 'bold' },
+      alternateRowStyles: { fillColor: [249, 250, 251] },
+      styles: { fontSize: 9, cellPadding: 3 },
+      margin: { top: 45 },
+    });
+
+    // Save
+    const fileName = `pre_venda_${new Date(entry.date).toISOString().split('T')[0]}_${entry.id.substring(0, 5)}.pdf`;
+    doc.save(fileName);
   };
 
   if (entries.length === 0) {
@@ -113,7 +166,7 @@ export function EmailHistory({ entries, onClear }: EmailHistoryProps) {
                 </button>
 
                 {entry.type === 'presales' && (
-                  <div className="pr-4">
+                  <div className="flex items-center gap-2 pr-4">
                     <Button
                       variant="ghost"
                       size="sm"
@@ -122,7 +175,17 @@ export function EmailHistory({ entries, onClear }: EmailHistoryProps) {
                       title="Baixar planilha Excel"
                     >
                       <Download className="w-4 h-4" />
-                      <span className="hidden sm:inline">Download</span>
+                      <span className="hidden lg:inline">Excel</span>
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => downloadPreSalesPDF(entry)}
+                      className="gap-2 text-rose-600 hover:text-rose-700 hover:bg-rose-50"
+                      title="Baixar PDF"
+                    >
+                      <PdfIcon className="w-4 h-4" />
+                      <span className="hidden lg:inline">PDF</span>
                     </Button>
                   </div>
                 )}
@@ -192,7 +255,7 @@ export function EmailHistory({ entries, onClear }: EmailHistoryProps) {
                     </div>
                   ) : entry.type === 'presales' && entry.preSalesData ? (
                     <div className="space-y-4">
-                      <div className="flex justify-end sm:hidden">
+                      <div className="flex gap-2 justify-end sm:hidden">
                         <Button
                           variant="outline"
                           size="sm"
@@ -200,7 +263,16 @@ export function EmailHistory({ entries, onClear }: EmailHistoryProps) {
                           className="gap-2 text-primary"
                         >
                           <Download className="w-4 h-4" />
-                          Baixar Planilha
+                          Excel
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => downloadPreSalesPDF(entry)}
+                          className="gap-2 text-rose-600 border-rose-200"
+                        >
+                          <PdfIcon className="w-4 h-4" />
+                          PDF
                         </Button>
                       </div>
                       <div className="overflow-x-auto rounded-lg border border-border">
