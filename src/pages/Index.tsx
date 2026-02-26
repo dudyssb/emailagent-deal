@@ -13,6 +13,7 @@ import { CaseSelection } from '@/components/CaseSelection';
 import { EmailHistory } from '@/components/EmailHistory';
 import { ManualEmailGenerator } from '@/components/ManualEmailGenerator';
 import { PreSalesInfo } from '@/components/PreSalesInfo';
+import { MarketIntelligence } from '@/components/MarketIntelligence';
 import { parseCSV, parseMetricsCSV } from '@/utils/csvParser';
 import { generateAllEmailsForSegment, CaseResultType, EmailGenerationConfig } from '@/utils/emailGenerator';
 import { EmailContact, ValidationError, Segment, CampaignMetrics, NurturingEmail, createEmptySegmentCounts } from '@/types/email';
@@ -307,7 +308,21 @@ export default function Index() {
           </div>
         );
 
+      case 'market-intel':
+        return (
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-bold text-foreground mb-2">Inteligência de Mercado</h2>
+              <p className="text-muted-foreground">
+                Pesquise informações detalhadas sobre leads e empresas.
+              </p>
+            </div>
+            <MarketIntelligence />
+          </div>
+        );
+
       case 'metrics':
+
         return (
           <div className="space-y-6">
             <div>
