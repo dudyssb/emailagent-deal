@@ -153,30 +153,37 @@ export function MarketIntelligence({ onResultsGenerated }: MarketIntelligencePro
         setIsGeneratingEmails(true);
 
         setTimeout(() => {
+            // Extração dinâmica de insights do dossiê
+            const insight = result.sections.find((s: any) => s.title.includes('Insights'))?.content || '';
+            const techInfo = result.sections.find((s: any) => s.title.includes('Mercado') || s.title.includes('IA'))?.content || '';
+
+            const promptContext = emailPrompt ? `Considerando seu pedido: "${emailPrompt}". ` : '';
+            const firstName = result.lead.split(' ')[0];
+
             const emails = [
                 {
                     id: 1,
                     sequence: 1,
-                    subject: `Desafio de Inovação na ${result.company}`,
-                    body: `Olá ${result.lead.split(' ')[0]},\n\nNotei que a ${result.company} está focada em ${result.segment}. Com as tendências de 2026 apontando para IA como infraestrutura básica, gostaria de discutir como podemos otimizar seu faturamento.\n\nAbraço.`
+                    subject: `Inovação e dados na ${result.company}`,
+                    body: `Olá ${firstName},\n\nNotei que a ${result.company} está avançando em ${result.segment}. ${promptContext}Com base no crescimento de IA projetado para 2026, como vocês estão preparando a infraestrutura de dados para suportar essa escala?\n\nAbraço.`
                 },
                 {
                     id: 2,
                     sequence: 2,
-                    subject: `Eficiência Operacional na ${result.company}`,
-                    body: `Oi ${result.lead.split(' ')[0]},\n\nComplementando meu contato anterior, vi que a automação pode reduzir em até 30% seus custos logísticos. Temos cases específicos para o seu segmento.\n\nPodemos falar 5 minutos?`
+                    subject: `Eficiência Operacional: Um insight para ${result.lead}`,
+                    body: `Oi ${firstName},\n\n${insight.split('.')[0]}. Vi que há uma oportunidade grande de otimização na ${result.company}. ${emailPrompt ? 'Alinhado ao que você sugeriu, o' : 'O'} foco em ROI rápido parece ser o caminho mais seguro agora.\n\nPodemos trocar uma ideia?`
                 },
                 {
                     id: 3,
                     sequence: 3,
-                    subject: `Insights Estratégicos para ${result.lead}`,
-                    body: `Prezado ${result.lead},\n\nBaseado na sua trajetória com transformação digital, acredito que a abordagem que estamos utilizando faria sentido para a ${result.company}.\n\nAbs.`
+                    subject: `Tendências 2026: ${result.company}`,
+                    body: `Prezado ${result.lead},\n\n${techInfo.split('.')[0]}. Considerando sua trajetória, acredito que a ${result.company} pode se beneficiar de uma abordagem mais técnica em modelos abertos.\n\n${emailPrompt || 'Espero que este insight seja útil.'}\n\nAbs.`
                 },
                 {
                     id: 4,
                     sequence: 4,
-                    subject: `Próximos passos - ${result.company}`,
-                    body: `Olá ${result.lead.split(' ')[0]},\n\nPara não tomar seu tempo, caso não tenha interesse agora, deixo aqui nosso material de apoio sobre tendências de mercado para 2026.\n\nSucesso!`
+                    subject: `Estratégia e Próximos Passos`,
+                    body: `Olá ${firstName},\n\nEntendo a correria. Se fizer sentido no futuro falarmos sobre como aplicar esses insights de inteligência na ${result.company}, conte comigo.\n\n${emailPrompt ? 'Fiquei com seu ponto sobre ' + emailPrompt.substring(0, 30) + '... na cabeça.' : ''}\n\nSucesso!`
                 }
             ];
             setGeneratedEmails(emails);
@@ -187,8 +194,8 @@ export function MarketIntelligence({ onResultsGenerated }: MarketIntelligencePro
             }
 
             toast({
-                title: "E-mails Gerados",
-                description: "Sequência de 4 e-mails criada com sucesso.",
+                title: "E-mails Dinâmicos Gerados",
+                description: "Sequência de 4 e-mails criada com base no dossiê e no seu prompt.",
             });
         }, 2000);
     };
@@ -397,11 +404,14 @@ export function MarketIntelligence({ onResultsGenerated }: MarketIntelligencePro
                         </CardHeader>
                         <CardContent className="space-y-4">
                             <div className="space-y-2">
-                                <Label htmlFor="emailPrompt" className="text-xs font-semibold uppercase text-muted-foreground">Prompt para os E-mails</Label>
+                                <Label htmlFor="emailPrompt" className="text-xs font-semibold uppercase text-muted-foreground flex items-center justify-between">
+                                    <span>Prompt Customizado para os E-mails</span>
+                                    <span className="text-[10px] lowercase font-normal opacity-70 italic">USA O DOSSIÊ COMO CONTEXTO</span>
+                                </Label>
                                 <textarea
                                     id="emailPrompt"
                                     className="w-full min-h-[100px] p-4 rounded-xl bg-muted/30 border-none text-sm focus:ring-2 focus:ring-primary transition-all text-white placeholder:text-muted-foreground"
-                                    placeholder="Ex: Quero uma série de 4 e-mails focados em redução de custos logísticos usando IA..."
+                                    placeholder="Ex: Quero focar em redução de custos logísticos ou automação de estoque..."
                                     value={emailPrompt}
                                     onChange={(e) => setEmailPrompt(e.target.value)}
                                 />
