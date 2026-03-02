@@ -10,7 +10,7 @@ import autoTable from 'jspdf-autotable';
 export interface HistoryEntry {
   id: string;
   date: string;
-  type?: 'emails' | 'list' | 'presales';
+  type?: 'emails' | 'list' | 'presales' | 'marketintel';
   segment?: Segment;
   contactCount: number;
   emails?: NurturingEmail[];
@@ -18,6 +18,10 @@ export interface HistoryEntry {
   listName?: string;
   contacts?: EmailContact[];
   preSalesData?: any[];
+  marketIntelData?: {
+    analysis: any;
+    emails: any[];
+  };
 }
 
 interface EmailHistoryProps {
@@ -140,6 +144,11 @@ export function EmailHistory({ entries, onClear }: EmailHistoryProps) {
                       <div className="flex items-center gap-2">
                         <Search className="w-5 h-5 text-primary" />
                         <span className="font-semibold text-foreground text-sm">Pesquisa: Pré-vendas</span>
+                      </div>
+                    ) : entry.type === 'marketintel' ? (
+                      <div className="flex items-center gap-2">
+                        <Search className="w-5 h-5 text-primary" />
+                        <span className="font-semibold text-foreground text-sm">Inteligência: {entry.marketIntelData?.analysis.lead || 'Mercado'}</span>
                       </div>
                     ) : (
                       entry.segment && <SegmentBadge segment={entry.segment} size="sm" />
@@ -309,6 +318,30 @@ export function EmailHistory({ entries, onClear }: EmailHistoryProps) {
                           </tbody>
                         </table>
                       </div>
+                    </div>
+                  ) : entry.type === 'marketintel' && entry.marketIntelData ? (
+                    <div className="space-y-4">
+                      <div className="grid md:grid-cols-2 gap-4">
+                        {entry.marketIntelData.analysis.sections.map((section: any, i: number) => (
+                          <div key={i} className="p-3 rounded-lg bg-muted/20 border border-border">
+                            <h5 className="text-xs font-bold text-primary uppercase mb-1">{section.title}</h5>
+                            <p className="text-xs text-muted-foreground line-clamp-3">{section.content}</p>
+                          </div>
+                        ))}
+                      </div>
+                      {entry.marketIntelData.emails.length > 0 && (
+                        <div className="pt-2 border-t border-border">
+                          <p className="text-xs font-bold text-foreground mb-3 uppercase tracking-wider">E-mails Gerados</p>
+                          <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                            {entry.marketIntelData.emails.map((email: any) => (
+                              <div key={email.id} className="p-2 rounded-lg bg-primary/5 border border-primary/10">
+                                <p className="text-[10px] font-bold text-primary mb-1">E-mail {email.sequence}</p>
+                                <p className="text-[10px] text-foreground truncate">{email.subject}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ) : (
                     entry.emails?.map((email) => (

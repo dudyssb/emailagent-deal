@@ -25,7 +25,7 @@ import { Sparkles, Upload } from 'lucide-react';
 export interface HistoryEntry {
   id: string;
   date: string;
-  type?: 'emails' | 'list' | 'presales';
+  type?: 'emails' | 'list' | 'presales' | 'marketintel';
   segment?: Segment;
   contactCount: number;
   emails?: NurturingEmail[];
@@ -33,6 +33,10 @@ export interface HistoryEntry {
   listName?: string;
   contacts?: EmailContact[];
   preSalesData?: any[];
+  marketIntelData?: {
+    analysis: any;
+    emails: any[];
+  };
 }
 
 const HISTORY_KEY = 'email-agent-history';
@@ -153,6 +157,22 @@ export default function Index() {
       setIsProcessingMetrics(false);
     }, 500);
   }, []);
+
+  const handleMarketIntelResults = useCallback((analysis: any, generatedEmails: any[]) => {
+    const entry: HistoryEntry = {
+      id: Date.now().toString(),
+      date: new Date().toISOString(),
+      type: 'marketintel',
+      contactCount: 1,
+      marketIntelData: {
+        analysis,
+        emails: generatedEmails
+      }
+    };
+    const updated = [entry, ...history].slice(0, 50);
+    setHistory(updated);
+    saveHistory(updated);
+  }, [history]);
 
   const handleClearHistory = useCallback(() => {
     setHistory([]);
@@ -317,7 +337,9 @@ export default function Index() {
                 Pesquise informações detalhadas sobre leads e empresas.
               </p>
             </div>
-            <MarketIntelligence />
+            <MarketIntelligence
+              onResultsGenerated={handleMarketIntelResults}
+            />
           </div>
         );
 
