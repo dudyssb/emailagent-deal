@@ -7,6 +7,9 @@ import { Search, FileText, Upload, Download, Globe, User, Building2, Send, Save,
 import { useToast } from '@/hooks/use-toast';
 import { jsPDF } from 'jspdf';
 import { cn } from '@/lib/utils';
+import { searchLinkedIn } from '@/utils/serpApi';
+
+const APP_VERSION = "1.0.1-serpapi";
 
 interface MarketIntelligenceProps {
     onResultsGenerated?: (analysis: any, emails: any[]) => void;
@@ -25,6 +28,8 @@ export function MarketIntelligence({ onResultsGenerated }: MarketIntelligencePro
     const [isGeneratingEmails, setIsGeneratingEmails] = useState(false);
     const [generatedEmails, setGeneratedEmails] = useState<any[]>([]);
     const [result, setResult] = useState<any>(null);
+    const [linkedInResults, setLinkedInResults] = useState<any[]>([]);
+    const [isSearchingLinkedIn, setIsSearchingLinkedIn] = useState(false);
     const { toast } = useToast();
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,7 +58,25 @@ export function MarketIntelligence({ onResultsGenerated }: MarketIntelligencePro
         }
 
         setIsSearching(true);
+        setIsSearchingLinkedIn(true);
         setGeneratedEmails([]); // Reset emails
+        setLinkedInResults([]);
+
+        // Real LinkedIn Search via SerpApi
+        searchLinkedIn(formData.name, formData.company)
+            .then(results => {
+                setLinkedInResults(results);
+                setIsSearchingLinkedIn(false);
+            })
+            .catch(err => {
+                console.error("LinkedIn search failed:", err);
+                setIsSearchingLinkedIn(false);
+                toast({
+                    title: "Erro na busca LinkedIn",
+                    description: "Não foi possível conectar ao SerpApi. Verifique sua chave API.",
+                    variant: "destructive"
+                });
+            });
 
         // Simulação de pesquisa robusta
         setTimeout(() => {
@@ -370,6 +393,46 @@ export function MarketIntelligence({ onResultsGenerated }: MarketIntelligencePro
 
             {result && (
                 <div className="space-y-6">
+                    {/* LinkedIn Results Section */}
+                    <div className="space-y-4">
+                        <h3 className="text-lg font-black uppercase tracking-widest flex items-center gap-2 text-foreground">
+                            <span className="w-1.5 h-4 bg-blue-600 rounded-full" />
+                            Perfis Encontrados no LinkedIn
+                            {isSearchingLinkedIn && <Search className="w-4 h-4 animate-spin text-blue-600" />}
+                        </h3>
+
+                        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                            {linkedInResults.length > 0 ? (
+                                linkedInResults.map((profile, i) => (
+                                    <a
+                                        key={i}
+                                        href={profile.link}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="p-4 rounded-xl border border-blue-500/20 bg-blue-500/5 hover:bg-blue-500/10 transition-all group flex flex-col justify-between"
+                                    >
+                                        <div>
+                                            <h4 className="text-sm font-bold text-blue-600 group-hover:underline mb-1 flex items-center gap-2">
+                                                <User className="w-4 h-4" />
+                                                {profile.title.split('-')[0].trim()}
+                                            </h4>
+                                            <p className="text-[11px] text-muted-foreground line-clamp-2 leading-relaxed mb-3">
+                                                {profile.snippet}
+                                            </p>
+                                        </div>
+                                        <div className="flex justify-end">
+                                            <span className="text-[10px] font-bold uppercase text-blue-500/70">Ver Perfil ↗</span>
+                                        </div>
+                                    </a>
+                                ))
+                            ) : !isSearchingLinkedIn && (
+                                <div className="col-span-full p-8 text-center border-2 border-dashed border-border rounded-xl">
+                                    <p className="text-sm text-muted-foreground">Nenhum perfil público encontrado para "{formData.name}"</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+
                     <Card className="border-primary/20 bg-card shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-500">
                         <CardHeader className="bg-muted/30 border-b border-border/50 rounded-t-xl">
                             <CardTitle className="text-xl flex justify-between items-center font-black text-foreground uppercase tracking-tight">
@@ -453,6 +516,12 @@ export function MarketIntelligence({ onResultsGenerated }: MarketIntelligencePro
                     </Card>
                 </div>
             )}
+
+            <div className="pt-10 pb-4 text-center">
+                <p className="text-[10px] font-mono text-muted-foreground opacity-30 uppercase tracking-[0.2em]">
+                    Email Agent Deal - v{APP_VERSION}
+                </p>
+            </div>
         </div>
     );
 }
