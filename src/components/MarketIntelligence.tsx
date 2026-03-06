@@ -9,7 +9,8 @@ import { jsPDF } from 'jspdf';
 import { cn } from '@/lib/utils';
 import { searchLinkedIn } from '@/utils/serpApi';
 
-const APP_VERSION = "1.0.1-serpapi";
+const APP_VERSION = "1.1.0-gemini";
+import { generateWithGemini } from '@/utils/geminiApi';
 
 interface MarketIntelligenceProps {
     onResultsGenerated?: (analysis: any, emails: any[]) => void;
@@ -59,116 +60,85 @@ export function MarketIntelligence({ onResultsGenerated }: MarketIntelligencePro
 
         setIsSearching(true);
         setIsSearchingLinkedIn(true);
-        setGeneratedEmails([]); // Reset emails
+        setGeneratedEmails([]);
         setLinkedInResults([]);
+        setResult(null);
 
-        // Real LinkedIn Search via SerpApi
-        searchLinkedIn(formData.name, formData.company)
+        // 1. Iniciar busca no LinkedIn (paralelo)
+        const linkedinPromise = searchLinkedIn(formData.name, formData.company)
             .then(results => {
                 setLinkedInResults(results);
                 setIsSearchingLinkedIn(false);
+                return results;
             })
             .catch(err => {
                 console.error("LinkedIn search failed:", err);
                 setIsSearchingLinkedIn(false);
+                return [];
+            });
+
+        // 2. Usar Gemini para pesquisa e análise vasta
+        const performGeminiAnalysis = async () => {
+            try {
+                const results = await linkedinPromise;
+                const linkedinContext = results.length > 0
+                    ? `Perfis encontrados no LinkedIn:\n${results.map(r => `- ${r.title}: ${r.snippet}`).join('\n')}`
+                    : "Nenhum perfil público de LinkedIn encontrado diretamente.";
+
+                const prompt = `
+                    Analise as seguintes informações e gere um Dossiê de Inteligência de Mercado detalhado:
+                    Lead: ${formData.name}
+                    Empresa: ${formData.company}
+                    Segmento: ${formData.segment}
+                    Site: ${formData.website}
+                    Contexto Extra: ${linkedinContext}
+
+                    Gere um JSON com a seguinte estrutura exatamente:
+                    {
+                      "lead": "${formData.name}",
+                      "company": "${formData.company}",
+                      "segment": "${formData.segment || 'Tecnologia'}",
+                      "sections": [
+                        {"title": "1. Perfil Executivo e Presença Digital", "content": "Análise detalhada do lead..."},
+                        {"title": "2. Histórico de Inovação e M&A", "content": "Fatos sobre a empresa..."},
+                        {"title": "3. Posicionamento de Mercado", "content": "Dados sobre faturamento, crescimento..."},
+                        {"title": "4. Insights Estratégicos para Abordagem", "content": "Como falar com esse lead..."}
+                      ]
+                    }
+                    Seja específico, use dados reais de mercado para 2025/2026. Se não tiver certeza de um dado, gere uma análise baseada em tendências reais do segmento.
+                `;
+
+                const systemInstruction = "Você é um Agente de Inteligência de Mercado especializado em consultoria de tecnologia e Transformação Digital (Deal). Sua linguagem é executiva, direta e focada em ROI e inovação.";
+
+                const response = await generateWithGemini(prompt, systemInstruction);
+
+                // Tenta extrair JSON da resposta do Gemini
+                const jsonMatch = response.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                    const analysisData = JSON.parse(jsonMatch[0]);
+                    setResult(analysisData);
+                    if (onResultsGenerated) onResultsGenerated(analysisData, []);
+
+                    toast({
+                        title: "Dossiê Inteligente Gerado",
+                        description: `Análise profunda sobre ${analysisData.lead} concluída via Gemini AI.`,
+                    });
+                } else {
+                    throw new Error("Resposta do Gemini não contém JSON válido");
+                }
+            } catch (error: any) {
+                console.error("Gemini analysis failed:", error);
                 toast({
-                    title: "Erro na busca LinkedIn",
-                    description: "Não foi possível conectar ao SerpApi. Verifique sua chave API.",
+                    title: "Erro na Análise IA",
+                    description: error.message || "Não foi possível gerar a análise com o Gemini.",
                     variant: "destructive"
                 });
-            });
-
-        // Simulação de pesquisa robusta
-        setTimeout(() => {
-            const nameLower = formData.name.toLowerCase();
-            let researchData: any = null;
-
-            if (nameLower.includes('fabio hayashi')) {
-                researchData = {
-                    lead: 'Fabio Hayashi',
-                    company: 'Deal Technologies',
-                    segment: 'Tecnologia / Serviços / M&A',
-                    sections: [
-                        {
-                            title: '1. Perfil Executivo',
-                            content: `Fabio Hayashi é o Fundador e CEO da Deal Technologies. Possui MBA em Gestão de Negócios pela FGV. É reconhecido como um estrategista nato com foco em Transformação Digital e M&A.`
-                        },
-                        {
-                            title: '2. Histórico de Inovação e M&A',
-                            content: `• 2012: Primeira operação de M&A concluída.\n• 2014: Investidor no Canal da Peça.\n• 2015: Aquisição da ManytoOne, criando o braço Digital da Deal.\n• 2018: Aquisição de uma Startup de Data, estabelecendo a vertical de BIG Data da Deal.`
-                        },
-                        {
-                            title: '3. Deal Technologies',
-                            content: `Sob sua liderança, a Deal reportou faturamento de R$ 105 milhões em 2022. A empresa foca em resolver problemas complexos de negócios através de tecnologia robusta e dados acionáveis.`
-                        },
-                        {
-                            title: '4. Posicionamento e Insights',
-                            content: `Fabio é colunista da Exame e membro do YPO. Sua abordagem é de "Minha Vida em uma Página", focando em síntese e eficiência. Abordagens devem ser diretas, focadas em ROI e escalabilidade de dados.`
-                        }
-                    ]
-                };
-            } else if (nameLower.includes('luciano vernaglia') || nameLower.includes('luciano martins')) {
-                researchData = {
-                    lead: 'Luciano Vernaglia Martins',
-                    company: 'Google DeepMind',
-                    segment: 'IA / Open Models / Developer Relations',
-                    sections: [
-                        {
-                            title: '1. Perfil Executivo',
-                            content: `Luciano Martins é Developer Advocate para IA e Open Models no Google DeepMind. Especialista em Cloud AI e habilitação de desenvolvedores, com forte presença na comunidade de IA generativa.`
-                        },
-                        {
-                            title: '2. Experiência em Cloud e IA',
-                            content: `• Google: Entrou em 2020. Atua em Cloud AI e modelos abertos (Gemini).\n• Ex-AWS, Oracle e IBM: Vasto histórico em sistemas corporativos.\n• Contribuições: Contribuiu para filtros de segurança no Google Gemini Cookbook.`
-                        },
-                        {
-                            title: '3. Formação e Habilidades',
-                            content: `Bacharel em Ciência da Computação pela UNAMA e Mestrando pela UNICAMP. Poliglota e proficiente em Python, infraestrutura como código e operacionalização de modelos de ML.`
-                        },
-                        {
-                            title: '4. Insights para Abordagem',
-                            content: `Foco em operacionalização confiável de modelos de ML e segurança em IA. Valoriza ferramentas que empoderam desenvolvedores e soluções técnicas reais.`
-                        }
-                    ]
-                };
-            } else {
-                researchData = {
-                    lead: formData.name,
-                    company: formData.company,
-                    segment: formData.segment || 'Varejo / Tecnologia',
-                    sections: [
-                        {
-                            title: '1. Perfil Executivo e Presença Digital',
-                            content: `Investigação sobre ${formData.name}. Atualmente identificado como um player estratégico na estratégia da ${formData.company}.`
-                        },
-                        {
-                            title: '2. Análise de Mercado (2025-2026)',
-                            content: `O setor de ${formData.segment || 'Varejo'} no Brasil projeta crescimento de 71% em tecnologia até 2025.`
-                        },
-                        {
-                            title: '3. Operações e Logística',
-                            content: `Oportunidade de reduzir custos em até 30% via automação de sistemas.`
-                        },
-                        {
-                            title: '4. Insights Estratégicos',
-                            content: `Abordagem deve focar em eficiência operacional via IA e melhoria do ROI.`
-                        }
-                    ]
-                };
+            } finally {
+                setIsSearching(false);
             }
+        };
 
-            setResult(researchData);
-            setIsSearching(false);
-
-            if (onResultsGenerated) {
-                onResultsGenerated(researchData, []);
-            }
-
-            toast({
-                title: "Dossiê Investigativo Gerado",
-                description: `Análise detalhada sobre ${researchData.lead} concluída.`,
-            });
-        }, 2500);
+        performGeminiAnalysis();
     };
 
     const handleGenerateEmails = () => {

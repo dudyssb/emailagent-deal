@@ -3,6 +3,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Upload, Image as ImageIcon, Code, Sparkles, Send } from 'lucide-react';
 import { NurturingEmail, EmailContact } from '@/types/email';
+import { generateWithGemini } from '@/utils/geminiApi';
 
 interface ManualEmailGeneratorProps {
     onGenerate: (emails: NurturingEmail[]) => void;
@@ -15,13 +16,27 @@ export function ManualEmailGenerator({ onGenerate }: ManualEmailGeneratorProps) 
     const [isGenerating, setIsGenerating] = useState(false);
     const [mode, setMode] = useState<'prompt' | 'html' | 'image'>('prompt');
 
-    const handleGenerate = () => {
+    const handleGenerate = async () => {
         setIsGenerating(true);
-        // Simulate API call for generation
-        setTimeout(() => {
+        try {
+            const systemInstruction = "Você é um especialista em Copywriting para E-mails de Vendas e Consultoria de TI. Seu tom é profissional, amigável e focado em gerar valor. Gere sempre um HTML completo e moderno.";
+
+            const userPrompt = mode === 'prompt'
+                ? prompt
+                : mode === 'html'
+                    ? `Melhore este HTML de e-mail e torne-o mais persuasivo:\n${htmlContent}`
+                    : `Analise as intenções deste print de e-mail e gere um novo e-mail baseado nele.`;
+
+            const aiResponse = await generateWithGemini(userPrompt, systemInstruction);
+
+            // Tenta extrair assunto e corpo se o Gemini formatar assim, senão usa padrão
+            const subjectMatch = aiResponse.match(/Assunto: (.*)/);
+            const subject = subjectMatch ? subjectMatch[1] : "Sua proposta personalizada da Deal";
+            const cleanHtml = aiResponse.replace(/Assunto: .*/, '').trim();
+
             const mockContact: EmailContact = {
-                nome: 'Lead Manual',
-                email: 'lead@exemplo.com',
+                nome: 'Lead Selecionado',
+                email: 'contato@empresa.com',
                 segmento: 'Outros' as any
             };
 
@@ -29,18 +44,21 @@ export function ManualEmailGenerator({ onGenerate }: ManualEmailGeneratorProps) 
                 {
                     id: Date.now().toString(),
                     sequence: 1,
-                    subject: 'Seu email personalizado chegou',
-                    htmlContent: `<html><body><h1>Olá ${mockContact.nome},</h1><p>Este é um email gerado a partir do seu ${mode === 'prompt' ? 'comando' : mode === 'html' ? 'código HTML' : 'print anexado'}.</p></body></html>`,
+                    subject: subject,
+                    htmlContent: cleanHtml.includes('<html>') ? cleanHtml : `<html><body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; padding: 20px;">${cleanHtml.replace(/\n/g, '<br>')}</body></html>`,
                     targetContact: mockContact
                 }
             ];
 
             onGenerate(generatedEmails);
-            setIsGenerating(false);
             setPrompt('');
             setHtmlContent('');
             setImage(null);
-        }, 1500);
+        } catch (error: any) {
+            console.error("Gemini email generation failed:", error);
+        } finally {
+            setIsGenerating(false);
+        }
     };
 
     return (
