@@ -21,7 +21,8 @@ export function MarketIntelligence({ onResultsGenerated }: MarketIntelligencePro
         name: '',
         company: '',
         segment: '',
-        website: ''
+        website: '',
+        linkedinUrl: ''
     });
     const [referenceFile, setReferenceFile] = useState<File | null>(null);
     const [isSearching, setIsSearching] = useState(false);
@@ -91,6 +92,7 @@ export function MarketIntelligence({ onResultsGenerated }: MarketIntelligencePro
                     Empresa: ${formData.company}
                     Segmento: ${formData.segment}
                     Site: ${formData.website}
+                    LinkedIn do Lead: ${formData.linkedinUrl}
                     Contexto Extra: ${linkedinContext}
 
                     Gere um JSON com a seguinte estrutura exatamente:
@@ -321,6 +323,10 @@ export function MarketIntelligence({ onResultsGenerated }: MarketIntelligencePro
                             <div className="space-y-2">
                                 <Label htmlFor="website" className="text-xs font-semibold uppercase text-muted-foreground">Site Oficial</Label>
                                 <Input id="website" placeholder="Ex: www.magazineluiza.com.br" value={formData.website} onChange={handleInputChange} className="bg-muted/30 border-none" />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="linkedinUrl" className="text-xs font-semibold uppercase text-muted-foreground">LinkedIn do Lead (URL)</Label>
+                                <Input id="linkedinUrl" placeholder="Ex: linkedin.com/in/perfil" value={formData.linkedinUrl} onChange={handleInputChange} className="bg-muted/30 border-none" />
                             </div>
                         </CardContent>
                     </Card>
