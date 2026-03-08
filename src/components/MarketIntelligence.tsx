@@ -145,56 +145,67 @@ export function MarketIntelligence({ onResultsGenerated }: MarketIntelligencePro
         performGeminiAnalysis();
     };
 
-    const handleGenerateEmails = () => {
+    const handleGenerateEmails = async () => {
         if (!result) return;
         setIsGeneratingEmails(true);
 
-        setTimeout(() => {
-            // Extração dinâmica de insights do dossiê
-            const insight = result.sections.find((s: any) => s.title.includes('Insights'))?.content || '';
-            const techInfo = result.sections.find((s: any) => s.title.includes('Mercado') || s.title.includes('IA'))?.content || '';
+        try {
+            const prompt = `
+                Com base no seguinte Dossiê de Inteligência de Mercado, gere uma sequência de 4 e-mails de prospecção fria.
+                
+                Dossiê:
+                ${JSON.stringify(result, null, 2)}
+                
+                Pedido Especial do Usuário para o tom/foco dos e-mails: "${emailPrompt || 'Foco em inovação e parceria estratégica.'}"
+                
+                Gere um JSON com a seguinte estrutura exatamente:
+                [
+                  {
+                    "id": 1,
+                    "sequence": 1,
+                    "subject": "Assunto do E-mail 1",
+                    "body": "Corpo do e-mail 1..."
+                  },
+                  ... (mais 3 e-mails)
+                ]
+                
+                Instruções:
+                - Use o nome do lead: ${result.lead}
+                - Referencie a empresa: ${result.company}
+                - Linguagem executiva, Deal (Transformação Digital), direta e focada em ROI.
+                - Os e-mails devem ser progressivos (Sequência 1 a 4).
+            `;
 
-            const promptContext = emailPrompt ? `Considerando seu pedido: "${emailPrompt}". ` : '';
-            const firstName = result.lead.split(' ')[0];
+            const systemInstruction = "Você é um especialista em Copywriting para Vendas B2B de tecnologia. Sua missão é criar e-mails que abram portas com executivos C-Level, sendo persuasivo sem ser invasivo.";
 
-            const emails = [
-                {
-                    id: 1,
-                    sequence: 1,
-                    subject: `Inovação e dados na ${result.company}`,
-                    body: `Olá ${firstName},\n\nNotei que a ${result.company} está avançando em ${result.segment}. ${promptContext}Com base no crescimento de IA projetado para 2026, como vocês estão preparando a infraestrutura de dados para suportar essa escala?\n\nAbraço.`
-                },
-                {
-                    id: 2,
-                    sequence: 2,
-                    subject: `Eficiência Operacional: Um insight para ${result.lead}`,
-                    body: `Oi ${firstName},\n\n${insight.split('.')[0]}. Vi que há uma oportunidade grande de otimização na ${result.company}. ${emailPrompt ? 'Alinhado ao que você sugeriu, o' : 'O'} foco em ROI rápido parece ser o caminho mais seguro agora.\n\nPodemos trocar uma ideia?`
-                },
-                {
-                    id: 3,
-                    sequence: 3,
-                    subject: `Tendências 2026: ${result.company}`,
-                    body: `Prezado ${result.lead},\n\n${techInfo.split('.')[0]}. Considerando sua trajetória, acredito que a ${result.company} pode se beneficiar de uma abordagem mais técnica em modelos abertos.\n\n${emailPrompt || 'Espero que este insight seja útil.'}\n\nAbs.`
-                },
-                {
-                    id: 4,
-                    sequence: 4,
-                    subject: `Estratégia e Próximos Passos`,
-                    body: `Olá ${firstName},\n\nEntendo a correria. Se fizer sentido no futuro falarmos sobre como aplicar esses insights de inteligência na ${result.company}, conte comigo.\n\n${emailPrompt ? 'Fiquei com seu ponto sobre ' + emailPrompt.substring(0, 30) + '... na cabeça.' : ''}\n\nSucesso!`
+            const response = await generateWithGemini(prompt, systemInstruction);
+
+            const jsonMatch = response.match(/\[[\s\S]*\]/);
+            if (jsonMatch) {
+                const emails = JSON.parse(jsonMatch[0]);
+                setGeneratedEmails(emails);
+
+                if (onResultsGenerated) {
+                    onResultsGenerated(result, emails);
                 }
-            ];
-            setGeneratedEmails(emails);
-            setIsGeneratingEmails(false);
 
-            if (onResultsGenerated) {
-                onResultsGenerated(result, emails);
+                toast({
+                    title: "E-mails Dinâmicos Gerados",
+                    description: "Sequência de 4 e-mails criada via Gemini AI com base no seu prompt.",
+                });
+            } else {
+                throw new Error("Resposta do Gemini não contém uma lista de e-mails em JSON.");
             }
-
+        } catch (error: any) {
+            console.error("Email generation failed:", error);
             toast({
-                title: "E-mails Dinâmicos Gerados",
-                description: "Sequência de 4 e-mails criada com base no dossiê e no seu prompt.",
+                title: "Erro ao Gerar E-mails",
+                description: error.message || "Não foi possível gerar os e-mails com a IA.",
+                variant: "destructive"
             });
-        }, 2000);
+        } finally {
+            setIsGeneratingEmails(false);
+        }
     };
 
     const downloadEmailHtml = (email: any) => {
