@@ -15,7 +15,7 @@ export async function generateWithGemini(prompt: string, systemInstruction: stri
 
     console.log("Debug: Chave Gemini detectada (Tamanho:", apiKey.length, ")");
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
     const body = {
         contents: [
