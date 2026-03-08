@@ -84,7 +84,9 @@ export function MarketIntelligence({ onResultsGenerated }: MarketIntelligencePro
         const performGeminiAnalysis = async () => {
             try {
                 // const results = await linkedinPromise; // Removido por hora
-                const linkedinContext = "Nenhum perfil público de LinkedIn pesquisado no momento."; // Simplificado por hora
+                const linkedinContext = formData.linkedinUrl
+                    ? `URL do LinkedIn do Lead para análise: ${formData.linkedinUrl}`
+                    : "Nenhum perfil público de LinkedIn pesquisado ou fornecido no momento.";
 
                 const prompt = `
                     Analise as seguintes informações e gere um Dossiê de Inteligência de Mercado detalhado:
