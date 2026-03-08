@@ -1,11 +1,21 @@
 
 export async function generateWithGemini(prompt: string, systemInstruction: string = "") {
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-    if (!apiKey || apiKey === "SUA_CHAVE_AQUI") {
-        throw new Error('Chave da API do Gemini não configurada no arquivo .env');
+    console.log("Debug: Verificando chave Gemini...");
+
+    if (!apiKey) {
+        console.error("Debug: VITE_GEMINI_API_KEY está undefined ou vazio.");
+        throw new Error('Chave da API do Gemini não encontrada. POR FAVOR, REINICIE O SERVIDOR (Ctrl+C e npm run dev).');
     }
 
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    if (apiKey === "SUA_CHAVE_AQUI") {
+        console.error("Debug: A chave ainda é o placeholder 'SUA_CHAVE_AQUI'.");
+        throw new Error('Chave da API do Gemini ainda está como o texto padrão no arquivo .env');
+    }
+
+    console.log("Debug: Chave Gemini detectada (Tamanho:", apiKey.length, ")");
+
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
 
     const body = {
         contents: [
