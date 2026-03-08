@@ -7,7 +7,7 @@ import { Search, FileText, Upload, Download, Globe, User, Building2, Send, Save,
 import { useToast } from '@/hooks/use-toast';
 import { jsPDF } from 'jspdf';
 import { cn } from '@/lib/utils';
-import { searchLinkedIn } from '@/utils/serpApi';
+// import { searchLinkedIn } from '@/utils/serpApi'; // Removido por hora
 
 const APP_VERSION = "1.1.0-gemini";
 import { generateWithGemini } from '@/utils/geminiApi';
@@ -29,8 +29,8 @@ export function MarketIntelligence({ onResultsGenerated }: MarketIntelligencePro
     const [isGeneratingEmails, setIsGeneratingEmails] = useState(false);
     const [generatedEmails, setGeneratedEmails] = useState<any[]>([]);
     const [result, setResult] = useState<any>(null);
-    const [linkedInResults, setLinkedInResults] = useState<any[]>([]);
-    const [isSearchingLinkedIn, setIsSearchingLinkedIn] = useState(false);
+    // const [linkedInResults, setLinkedInResults] = useState<any[]>([]); // Removido por hora
+    // const [isSearchingLinkedIn, setIsSearchingLinkedIn] = useState(false); // Removido por hora
     const { toast } = useToast();
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -59,12 +59,13 @@ export function MarketIntelligence({ onResultsGenerated }: MarketIntelligencePro
         }
 
         setIsSearching(true);
-        setIsSearchingLinkedIn(true);
+        // setIsSearchingLinkedIn(true); // Removido por hora
         setGeneratedEmails([]);
-        setLinkedInResults([]);
+        // setLinkedInResults([]); // Removido por hora
         setResult(null);
 
-        // 1. Iniciar busca no LinkedIn (paralelo)
+        // 1. Iniciar busca no LinkedIn (paralelo) - REMOVIDO POR HORA
+        /*
         const linkedinPromise = searchLinkedIn(formData.name, formData.company)
             .then(results => {
                 setLinkedInResults(results);
@@ -76,14 +77,13 @@ export function MarketIntelligence({ onResultsGenerated }: MarketIntelligencePro
                 setIsSearchingLinkedIn(false);
                 return [];
             });
+        */
 
         // 2. Usar Gemini para pesquisa e análise vasta
         const performGeminiAnalysis = async () => {
             try {
-                const results = await linkedinPromise;
-                const linkedinContext = results.length > 0
-                    ? `Perfis encontrados no LinkedIn:\n${results.map(r => `- ${r.title}: ${r.snippet}`).join('\n')}`
-                    : "Nenhum perfil público de LinkedIn encontrado diretamente.";
+                // const results = await linkedinPromise; // Removido por hora
+                const linkedinContext = "Nenhum perfil público de LinkedIn pesquisado no momento."; // Simplificado por hora
 
                 const prompt = `
                     Analise as seguintes informações e gere um Dossiê de Inteligência de Mercado detalhado:
@@ -363,7 +363,8 @@ export function MarketIntelligence({ onResultsGenerated }: MarketIntelligencePro
 
             {result && (
                 <div className="space-y-6">
-                    {/* LinkedIn Results Section */}
+                    {/* LinkedIn Results Section - REMOVIDO POR HORA */}
+                    {/* 
                     <div className="space-y-4">
                         <h3 className="text-lg font-black uppercase tracking-widest flex items-center gap-2 text-foreground">
                             <span className="w-1.5 h-4 bg-blue-600 rounded-full" />
@@ -402,6 +403,7 @@ export function MarketIntelligence({ onResultsGenerated }: MarketIntelligencePro
                             )}
                         </div>
                     </div>
+                    */}
 
                     <Card className="border-primary/20 bg-card shadow-2xl animate-in fade-in slide-in-from-bottom-4 duration-500">
                         <CardHeader className="bg-muted/30 border-b border-border/50 rounded-t-xl">
