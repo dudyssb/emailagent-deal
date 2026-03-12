@@ -24,31 +24,40 @@ export function ManualEmailGenerator({ onGenerate }: ManualEmailGeneratorProps) 
     const handleGenerate = async (isRefinement: boolean = false) => {
         setIsGenerating(true);
         try {
-            const systemInstruction = "Você é um especialista em Copywriting B2B e HTML de e-mails. Sua missão é gerar e-mails altamente profissionais e persuasivos. Sempre retorne o conteúdo em HTML completo.";
+            const systemInstruction = `Você é um Especialista em Copywriting B2B e HTML. 
+            REGRAS CRÍTICAS:
+            1. Retorne SEMPRE um JSON com as chaves "subject" e "body".
+            2. O campo "body" deve ser um HTML COMPLETO e PROFISSIONAL.
+            3. NÃO adicione nenhum texto explicativo, saudação ou conversa fora do JSON.
+            4. Responda APENAS o objeto JSON.`;
 
             const currentPrompt = isRefinement ? refinement : prompt;
 
             let userPrompt = "";
             if (!isRefinement) {
                 userPrompt = mode === 'prompt'
-                    ? `Gere um e-mail B2B persuasivo com base neste pedido: "${prompt}". Retorne o HTML completo.`
+                    ? `Gere um e-mail B2B persuasivo com base neste pedido: "${prompt}".`
                     : mode === 'html'
                         ? `Melhore este HTML de e-mail e torne-o mais persuasivo:\n${htmlContent}`
                         : `Analise as intenções deste print de e-mail e gere um novo e-mail baseado nele.`;
             } else {
                 userPrompt = `
-                    O usuário solicitou uma alteração no e-mail gerado anteriormente.
+                    O usuário solicitou uma alteração no e-mail anterior.
                     Histórico: ${JSON.stringify(emailHistory, null, 2)}
-                    Pedido de Refinamento: "${refinement}"
-                    Por favor, re-gere o e-mail aplicando as alterações solicitadas. Retorne sempre o HTML completo.
+                    Alteração desejada: "${refinement}"
+                    Re-gere o JSON com subject e body (HTML).
                 `;
             }
 
             const aiResponse = await generateWithGemini(userPrompt, systemInstruction);
 
-            const subjectMatch = aiResponse.match(/Assunto: (.*)/) || aiResponse.match(/Subject: (.*)/);
-            const subject = subjectMatch ? subjectMatch[1] : "Sua proposta personalizada da Deal";
-            const cleanHtml = aiResponse.replace(/(Assunto|Subject): .*/i, '').trim();
+            // Tenta extrair JSON (Gemini às vezes coloca em blocos de código)
+            const jsonMatch = aiResponse.match(/\{[\s\S]*\}/);
+            if (!jsonMatch) throw new Error("Não foi possível processar a resposta da IA. Tente novamente.");
+
+            const emailData = JSON.parse(jsonMatch[0]);
+            const subject = emailData.subject || "Proposta Estratégica Deal";
+            const body = emailData.body || "";
 
             const mockContact: EmailContact = {
                 nome: 'Lead Selecionado',
@@ -61,7 +70,7 @@ export function ManualEmailGenerator({ onGenerate }: ManualEmailGeneratorProps) 
                     id: Date.now().toString(),
                     sequence: 1,
                     subject: subject,
-                    htmlContent: cleanHtml.includes('<html>') ? cleanHtml : `<html><body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; padding: 20px;">${cleanHtml.replace(/\n/g, '<br>')}</body></html>`,
+                    htmlContent: body.includes('<html>') ? body : `<html><body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; padding: 20px;">${body.replace(/\n/g, '<br>')}</body></html>`,
                     targetContact: mockContact
                 }
             ];
