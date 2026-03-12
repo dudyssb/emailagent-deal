@@ -1,27 +1,30 @@
 
-export async function generateWithGemini(prompt: string, systemInstruction: string = "") {
+export async function generateWithGemini(prompt: string, systemInstruction: string = "", imageData?: { mimeType: string, data: string }) {
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-    console.log("Debug: Verificando chave Gemini...");
 
     if (!apiKey) {
-        console.error("Debug: VITE_GEMINI_API_KEY está undefined ou vazio.");
-        throw new Error('Chave da API do Gemini não encontrada. POR FAVOR, REINICIE O SERVIDOR (Ctrl+C e npm run dev).');
+        throw new Error('Chave da API do Gemini não encontrada.');
     }
 
-    if (apiKey === "SUA_CHAVE_AQUI") {
-        console.error("Debug: A chave ainda é o placeholder 'SUA_CHAVE_AQUI'.");
-        throw new Error('Chave da API do Gemini ainda está como o texto padrão no arquivo .env');
+    // Usando gemini-1.5-flash por padrão se o 2.5 não existir (flexibilidade)
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+    const parts: any[] = [{ text: prompt }];
+
+    if (imageData) {
+        parts.push({
+            inline_data: {
+                mime_type: imageData.mimeType,
+                data: imageData.data
+            }
+        });
     }
-
-    console.log("Debug: Chave Gemini detectada (Tamanho:", apiKey.length, ")");
-
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
 
     const body = {
         contents: [
             {
                 role: "user",
-                parts: [{ text: prompt }]
+                parts: parts
             }
         ],
         system_instruction: systemInstruction ? {
