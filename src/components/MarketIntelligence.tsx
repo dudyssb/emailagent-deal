@@ -464,7 +464,7 @@ export function MarketIntelligence({ onResultsGenerated }: MarketIntelligencePro
                                 </Label>
                                 <textarea
                                     id="emailPrompt"
-                                    className="w-full min-h-[100px] p-4 rounded-xl bg-muted/30 border-none text-sm focus:ring-2 focus:ring-primary transition-all text-white placeholder:text-muted-foreground"
+                                    className="w-full min-h-[100px] p-4 rounded-xl bg-muted/30 border border-input text-sm focus:ring-2 focus:ring-primary transition-all text-foreground placeholder:text-muted-foreground"
                                     placeholder="Ex: Quero focar em redução de custos logísticos ou automação de estoque..."
                                     value={emailPrompt}
                                     onChange={(e) => setEmailPrompt(e.target.value)}
