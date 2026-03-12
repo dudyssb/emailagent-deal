@@ -2,6 +2,8 @@ import { useState } from 'react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Upload, Image as ImageIcon, Code, Sparkles, Send, Download } from 'lucide-react';
+import { jsPDF } from 'jspdf';
+import { cn } from '@/lib/utils';
 import { NurturingEmail, EmailContact } from '@/types/email';
 import { generateWithGemini } from '@/utils/geminiApi';
 import { useToast } from '@/hooks/use-toast';
@@ -126,7 +128,7 @@ export function ManualEmailGenerator({ onGenerate }: ManualEmailGeneratorProps) 
             console.error("Gemini email generation failed:", error);
             toast({
                 title: "Erro na Geração",
-                description: "Não foi possível processar o seu pedido.",
+                description: error.message || "Não foi possível processar o seu pedido.",
                 variant: "destructive"
             });
         } finally {

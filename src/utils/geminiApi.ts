@@ -6,8 +6,8 @@ export async function generateWithGemini(prompt: string, systemInstruction: stri
         throw new Error('Chave da API do Gemini não encontrada.');
     }
 
-    // Usando gemini-1.5-flash por padrão se o 2.5 não existir (flexibilidade)
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+    // v1beta suporta response_mime_type: 'application/json'
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
 
     const parts: any[] = [{ text: prompt }];
 
@@ -35,6 +35,7 @@ export async function generateWithGemini(prompt: string, systemInstruction: stri
             topK: 40,
             topP: 0.95,
             maxOutputTokens: 8192,
+            response_mime_type: "application/json"
         }
     };
 
