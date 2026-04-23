@@ -10,7 +10,8 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 const VALID_USERS = [
   { username: 'DudaBastos', password: 'Ld2LCumdiJ24' },
-  { username: 'KarineSoares', password: 'Deal@2026' }
+  { username: 'KarineSoares', password: 'Deal@2026' },
+  { username: 'jefferson.sestaro', password: '2026@jefferson' }
 ];
 const AUTH_KEY = 'email_agent_auth';
 
