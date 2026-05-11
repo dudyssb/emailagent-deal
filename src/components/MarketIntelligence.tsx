@@ -10,7 +10,6 @@ import { cn } from '@/lib/utils';
 
 const APP_VERSION = "1.1.0-gemini";
 import { generateWithGemini } from '@/utils/geminiApi';
-import { searchLinkedIn } from '@/utils/serpApi';
 
 interface MarketIntelligenceProps {
     onResultsGenerated?: (analysis: any, emails: any[]) => void;
@@ -21,8 +20,7 @@ export function MarketIntelligence({ onResultsGenerated }: MarketIntelligencePro
         name: '',
         company: '',
         segment: '',
-        website: '',
-        linkedinUrl: ''
+        website: ''
     });
     const [referenceFile, setReferenceFile] = useState<File | null>(null);
     const [isSearching, setIsSearching] = useState(false);
@@ -35,6 +33,18 @@ export function MarketIntelligence({ onResultsGenerated }: MarketIntelligencePro
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { id, value } = e.target;
         setFormData(prev => ({ ...prev, [id]: value }));
+    };
+
+    const fileToBase64 = (file: File): Promise<string> => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => {
+                const base64String = reader.result as string;
+                resolve(base64String.split(',')[1]);
+            };
+            reader.onerror = (error) => reject(error);
+        });
     };
 
     const handleSearch = () => {
@@ -53,23 +63,13 @@ export function MarketIntelligence({ onResultsGenerated }: MarketIntelligencePro
 
         const performGeminiAnalysis = async () => {
             try {
-                let realLinkedinData = "";
-                let linkedinContext = formData.linkedinUrl
-                    ? `URL do LinkedIn do Lead: ${formData.linkedinUrl}`
-                    : "Nenhum perfil público de LinkedIn pesquisado ou fornecido no momento.";
-
-                // Busca dados reais no SerpApi
-                if (formData.name || formData.linkedinUrl) {
-                    try {
-                        const results = await searchLinkedIn(formData.name, formData.company, formData.linkedinUrl);
-                        if (results && results.length > 0) {
-                            realLinkedinData = `\nResultados Reais da Pesquisa Google/LinkedIn (USE O CARGO/TÍTULO DAQUI):\n` +
-                                results.map((r: any) => `Título: ${r.title}\nResumo/Cargo: ${r.snippet}\nLink: ${r.link}`).join('\n\n');
-                            linkedinContext += realLinkedinData;
-                        }
-                    } catch (e) {
-                        console.warn("Erro ao buscar dados reais do LinkedIn:", e);
-                    }
+                let imageData = undefined;
+                if (referenceFile) {
+                    const base64Data = await fileToBase64(referenceFile);
+                    imageData = {
+                        mimeType: referenceFile.type || 'application/pdf',
+                        data: base64Data
+                    };
                 }
 
                 const prompt = `
@@ -78,8 +78,8 @@ export function MarketIntelligence({ onResultsGenerated }: MarketIntelligencePro
                     Empresa: ${formData.company}
                     Segmento: ${formData.segment}
                     Site: ${formData.website}
-                    LinkedIn do Lead: ${formData.linkedinUrl}
-                    Contexto Extra: ${linkedinContext}
+                    
+                    ${referenceFile ? "ATENÇÃO: LEIA O PDF EM ANEXO. ELE CONTÉM O PERFIL REAL DO LINKEDIN. USE O CARGO EXATO, HISTÓRICO E RESUMO DO PDF PARA CRIAR A ANÁLISE." : ""}
 
                     Gere um JSON com a seguinte estrutura exatamente:
                     {
@@ -98,7 +98,7 @@ export function MarketIntelligence({ onResultsGenerated }: MarketIntelligencePro
 
                 const systemInstruction = "Você é um Agente de Inteligência de Mercado especializado em consultoria de tecnologia e Transformação Digital (Deal). Sua linguagem é executiva, direta e focada em ROI e inovação.";
 
-                const response = await generateWithGemini(prompt, systemInstruction);
+                const response = await generateWithGemini(prompt, systemInstruction, imageData);
                 const jsonMatch = response.match(/\{[\s\S]*\}/);
                 if (jsonMatch) {
                     const analysisData = JSON.parse(jsonMatch[0]);
@@ -288,8 +288,19 @@ export function MarketIntelligence({ onResultsGenerated }: MarketIntelligencePro
                                 <Input id="website" placeholder="Ex: www.magazineluiza.com.br" value={formData.website} onChange={handleInputChange} className="bg-muted/30 border border-input text-foreground" />
                             </div>
                             <div className="space-y-2">
-                                <Label htmlFor="linkedinUrl" className="text-xs font-semibold uppercase text-muted-foreground">LinkedIn do Lead (URL)</Label>
-                                <Input id="linkedinUrl" placeholder="Ex: linkedin.com/in/perfil" value={formData.linkedinUrl} onChange={handleInputChange} className="bg-muted/30 border border-input text-foreground" />
+                                <Label htmlFor="referenceFile" className="text-xs font-semibold uppercase text-muted-foreground flex items-center gap-2"><Upload className="w-4 h-4"/> Perfil do LinkedIn (PDF)</Label>
+                                <div className="relative">
+                                    <Input 
+                                        type="file" 
+                                        accept=".pdf" 
+                                        id="referenceFile" 
+                                        className="bg-muted/30 border border-input text-foreground cursor-pointer file:text-primary file:font-bold file:uppercase file:text-xs file:tracking-widest"
+                                        onChange={(e) => setReferenceFile(e.target.files?.[0] || null)}
+                                    />
+                                    {referenceFile && (
+                                        <p className="text-[10px] text-primary mt-1 absolute -bottom-4 truncate w-full">Arquivo anexado: {referenceFile.name}</p>
+                                    )}
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
