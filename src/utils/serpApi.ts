@@ -1,10 +1,14 @@
-export async function searchLinkedIn(name: string, company: string = '') {
+export async function searchLinkedIn(name: string, company: string = '', linkedinUrl: string = '') {
     const apiKey = import.meta.env.VITE_SERPAPI_KEY;
     if (!apiKey) {
         throw new Error('SerpApi key not found in environment variables');
     }
 
-    const query = `site:linkedin.com/in "${name}" ${company}`;
+    let query = `site:linkedin.com/in "${name}" ${company}`;
+    if (linkedinUrl) {
+        // Se a URL exata for fornecida, pesquisamos ela para extrair o snippet (cargo) do Google
+        query = linkedinUrl;
+    }
     // Usando o proxy local para contornar erros de CORS
     const url = `/api/serpapi?engine=google&q=${encodeURIComponent(query)}&api_key=${apiKey}`;
 

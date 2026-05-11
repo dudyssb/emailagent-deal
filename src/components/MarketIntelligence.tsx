@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 
 const APP_VERSION = "1.1.0-gemini";
 import { generateWithGemini } from '@/utils/geminiApi';
+import { searchLinkedIn } from '@/utils/serpApi';
 
 interface MarketIntelligenceProps {
     onResultsGenerated?: (analysis: any, emails: any[]) => void;
@@ -52,9 +53,24 @@ export function MarketIntelligence({ onResultsGenerated }: MarketIntelligencePro
 
         const performGeminiAnalysis = async () => {
             try {
-                const linkedinContext = formData.linkedinUrl
-                    ? `URL do LinkedIn do Lead para análise: ${formData.linkedinUrl}`
+                let realLinkedinData = "";
+                let linkedinContext = formData.linkedinUrl
+                    ? `URL do LinkedIn do Lead: ${formData.linkedinUrl}`
                     : "Nenhum perfil público de LinkedIn pesquisado ou fornecido no momento.";
+
+                // Busca dados reais no SerpApi
+                if (formData.name || formData.linkedinUrl) {
+                    try {
+                        const results = await searchLinkedIn(formData.name, formData.company, formData.linkedinUrl);
+                        if (results && results.length > 0) {
+                            realLinkedinData = `\nResultados Reais da Pesquisa Google/LinkedIn (USE O CARGO/TÍTULO DAQUI):\n` +
+                                results.map((r: any) => `Título: ${r.title}\nResumo/Cargo: ${r.snippet}\nLink: ${r.link}`).join('\n\n');
+                            linkedinContext += realLinkedinData;
+                        }
+                    } catch (e) {
+                        console.warn("Erro ao buscar dados reais do LinkedIn:", e);
+                    }
+                }
 
                 const prompt = `
                     Analise as seguintes informações e gere um Dossiê de Inteligência de Mercado detalhado:
